@@ -1,2 +1,3 @@
-# PusulaInfra.github.io
-Pusula Serve live console
+Live console for Pusula Serve.
+
+Product: https://github.com/PusulaInfra/pusula-serve
