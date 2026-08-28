@@ -1,3 +1,8 @@
-Live console for Pusula Serve.
+# Pusula Serve — live v1
 
-Product: https://github.com/PusulaInfra/pusula-serve
+https://pusulainfra.github.io/
+
+Product repo: https://github.com/PusulaInfra/pusula-serve
+X: https://x.com/pusulainfra
+
+The chip is not the bill.
