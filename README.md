@@ -1,8 +1,9 @@
-# Pusula Serve — live v1
+# Pusula
 
-https://pusulainfra.github.io/
+- Serve (pin this): https://pusulainfra.github.io/
+- Ops: https://pusulainfra.github.io/ops/
 
-Product repo: https://github.com/PusulaInfra/pusula-serve
+Product repos: [pusula-serve](https://github.com/PusulaInfra/pusula-serve) · [pusula-bill](https://github.com/PusulaInfra/pusula-bill)
 X: https://x.com/pusulainfra
 
 The chip is not the bill.
