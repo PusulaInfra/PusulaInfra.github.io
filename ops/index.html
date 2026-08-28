@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html lang="en"><head>
-<meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<meta name="theme-color" content="#07080c"/>
 <title>Pusula Ops</title>
 <style>
 :root{--bg:#07080c;--ink:#e8edf6;--dim:#8a93a6;--line:#262b38;--card:#10131a;--cyan:#6ee0ff;--ok:#5ee9b5;--bad:#ff6b81}
@@ -19,7 +21,7 @@ label{display:block;font-size:11px;color:var(--dim);letter-spacing:.08em;text-tr
 select,input{width:100%;background:#0b0e14;color:var(--ink);border:1px solid var(--line);border-radius:10px;padding:10px;font-size:16px}
 .g{display:grid;grid-template-columns:1fr 1fr;gap:8px}
 .kpi{display:grid;grid-template-columns:1fr 1fr;gap:8px}.kpi b{display:block;font-size:18px;margin-top:4px}
-.ok{color:var(--ok)}.bad{color:var(--bad)}a{color:var(--cyan)}.hide{display:none}
+.ok{color:var(--ok)}.bad{color:var(--bad)}.hide{display:none}
 table{width:100%;border-collapse:collapse;font-size:13px;margin-top:8px}th,td{border-bottom:1px solid var(--line);padding:7px 4px;text-align:left}th{color:var(--dim);font-size:11px}
 </style></head><body>
 <header>
@@ -38,8 +40,8 @@ table{width:100%;border-collapse:collapse;font-size:13px;margin-top:8px}th,td{bo
 <div class="card">
 <label>Box $/hr</label>
 <select id="box">
-<option value="3.2">H100 ~$3.2/hr</option>
-<option value="2.5">H100 spot ~$2.5/hr</option>
+<option value="2.5" selected>H100 spot ~$2.5/hr</option>
+<option value="3.2">H100 on-demand ~$3.2/hr</option>
 <option value="3.44">H200 droplet ~$3.44/hr</option>
 <option value="0.7">RTX 5090 ~$0.7/hr</option>
 <option value="1.1">Spark own ~$1.1/hr</option>
@@ -47,12 +49,11 @@ table{width:100%;border-collapse:collapse;font-size:13px;margin-top:8px}th,td{bo
 <div class="g">
 <div><label>GPU count</label><input id="n" type="number" value="4" min="1"/></div>
 <div><label>Hours / month</label><input id="hrs" type="number" value="720"/></div>
-<div><label>Peak tok/s / GPU</label><input id="tps" type="number" value="380"/></div>
+<div><label>Peak out tok/s / GPU</label><input id="tps" type="number" value="1600"/></div>
 <div><label>Duty cycle 0–1</label><input id="util" type="number" value="0.40" step="0.05" min="0.05" max="1"/></div>
 <div><label>API $/M out</label><input id="api" type="number" value="0.65" step="0.05"/></div>
-<div><label>Out / in mix</label><input id="mix" type="number" value="0.35" step="0.05" min="0.05" max="1"/></div>
 </div>
-<p class="note">Duty cycle = GPU gerçekten iş yaptığı pay. Peak tok/s = doymuş batch.</p>
+<p class="note">Peak = doymuş batch çıktı tok/s, tek stream değil. 40% chat duty normal. 380 tok/s ile $0.65 API asla kırılmaz — o yüzden varsayılan 1600.</p>
 </div>
 <div class="card">
 <div class="kpi">
@@ -134,20 +135,18 @@ table{width:100%;border-collapse:collapse;font-size:13px;margin-top:8px}th,td{bo
 const $=function(id){return document.getElementById(id)};
 function cpm(rate,tps,u){return (rate/(tps*3600*u))*1e6}
 function bill(){
-  const rate=+$("box").value,n=+$("n").value,hrs=+$("hrs").value,tps=+$("tps").value,u=+$("util").value,api=+$("api").value;
-  const month=rate*n*hrs;
-  const unit=cpm(rate,tps,u);
-  const x=rate/(tps*3600*(api/1e6));
-  const win=unit<api;
+  const rate=+$("box").value,n=+$("n").value,hrs=+$("hrs").value,tps=Math.max(1,+$("tps").value),u=Math.max(0.01,+$("util").value),api=Math.max(0.01,+$("api").value);
+  const month=rate*n*hrs, unit=cpm(rate,tps,u), x=rate*1e6/(tps*3600*api), win=unit<api;
   $("m-box").textContent="$"+month.toFixed(0);
   $("m-unit").textContent="$"+unit.toFixed(2);
   $("m-vs").textContent=win?"BOX":"API";
   $("m-vs").className=win?"ok":"bad";
-  $("m-x").textContent=(x*100).toFixed(0)+"%";
-  $("billCut").textContent=win?("Box wins at "+(u*100).toFixed(0)+"% duty. Crossover ~"+(x*100).toFixed(0)+"%."):("API wins. Crossover ~"+(x*100).toFixed(0)+"% before self-host pays.");
+  $("m-x").textContent=x>1?"won't cross":((x*100).toFixed(0)+"%");
+  $("billCut").textContent=x>1
+    ?("This tok/s never beats $"+api.toFixed(2)+"/M. Raise peak tok/s or pick a cheaper box.")
+    :(win?("Box wins at "+(u*100).toFixed(0)+"% duty. Crossover ~"+(x*100).toFixed(0)+"%."):("API wins until ~"+(x*100).toFixed(0)+"% duty."));
   $("board").innerHTML=[0.10,0.25,0.40,0.60,0.80].map(function(v){
-    const c=cpm(rate,tps,v);
-    const w=c<api?"box":"api";
+    const c=cpm(rate,tps,v), w=c<api?"box":"api";
     return "<tr><td>"+(v*100).toFixed(0)+"%</td><td>$"+c.toFixed(2)+"</td><td class='"+(w==="box"?"ok":"bad")+"'>"+w+"</td></tr>";
   }).join("");
 }
@@ -192,6 +191,6 @@ document.querySelectorAll(".tabs button").forEach(function(b){
     ["bill","slo","route","pay"].forEach(function(t){$("p-"+t).className=b.dataset.t===t?"":"hide"});
   };
 });
-["box","n","hrs","tps","util","api","mix","slo","min","down","ttft","ttftb","itl","osl","badp","kind","host","many","wait","aff"].forEach(function(id){$(id).addEventListener("input",paint)});
+["box","n","hrs","tps","util","api","slo","min","down","ttft","ttftb","itl","osl","badp","kind","host","many","wait","aff"].forEach(function(id){$(id).addEventListener("input",paint)});
 paint();
 </script></body></html>
