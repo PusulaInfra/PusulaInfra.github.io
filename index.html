@@ -3,12 +3,16 @@
 <meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
 <meta name="theme-color" content="#07080c"/>
 <title>Pusula Serve</title>
+<link rel="icon" href="icon.svg"/>
+<meta property="og:image" content="https://pusulainfra.github.io/banner.svg"/>
+<meta property="og:title" content="Pusula Serve"/>
+<meta name="description" content="LLM serving config copilot. The chip is not the bill."/>
 <style>
 :root{--bg:#07080c;--ink:#e8edf6;--dim:#8a93a6;--line:#262b38;--card:#10131a;--cyan:#6ee0ff;--ok:#5ee9b5;--bad:#ff6b81;--warn:#f5c16c}
 *{box-sizing:border-box}html,body{margin:0;background:var(--bg);color:var(--ink);font-family:ui-sans-serif,system-ui,sans-serif}
 header{padding:16px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;gap:10px;align-items:flex-start}
 .ident{display:flex;gap:10px;align-items:flex-start}
-.mark{width:36px;height:36px;border-radius:10px;background:linear-gradient(145deg,#0b2a33,#123a46);border:1px solid #2a6d7c;color:var(--cyan);display:flex;align-items:center;justify-content:center;font:800 16px ui-monospace,monospace;flex-shrink:0}
+.mark{width:36px;height:36px;border-radius:10px;overflow:hidden;border:1px solid #2a6d7c;flex-shrink:0;padding:0}.mark img{width:100%;height:100%;display:block;object-fit:cover}.hero{line-height:0;border-bottom:1px solid var(--line)}.hero img{width:100%;display:block;max-height:140px;object-fit:cover}
 .brand{font:700 13px ui-monospace,monospace;letter-spacing:.12em;text-transform:uppercase;color:var(--cyan)}
 .sub{color:var(--dim);font-size:13px;margin:6px 0 0;max-width:42ch}
 header a,header button{color:var(--ink);text-decoration:none;border:1px solid var(--line);background:#141821;border-radius:8px;padding:7px 10px;font-size:12px}
@@ -29,11 +33,12 @@ pre{margin:0;white-space:pre-wrap;font:12px/1.45 ui-monospace,monospace;color:va
 .node{border:1px solid var(--line);border-radius:10px;padding:10px;margin:6px 0;background:#0b0e14;display:flex;justify-content:space-between}
 #boot{position:fixed;inset:0;z-index:20;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;transition:opacity .35s ease}
 #boot.hide{opacity:0;pointer-events:none}
-#boot .mark{width:64px;height:64px;border-radius:16px;font-size:28px}
+#boot .mark{width:64px;height:64px;border-radius:16px}
 #boot p{margin:0;color:var(--dim);font-size:13px}
 </style></head><body>
-<div id="boot"><div class="mark">P</div><div class="brand">Pusula Serve</div><p>The chip is not the bill.</p></div>
-<header><div class="ident"><div class="mark">P</div><div><div class="brand">Pusula Serve</div><p class="sub">The chip is not the bill.</p></div></div><div class="row" style="margin:0"><a href="/ops/">Ops</a><button type="button" id="share">Share</button><a href="https://x.com/pusulainfra">X</a><a href="https://github.com/PusulaInfra/pusula-serve">Repo</a></div></header>
+<div id="boot"><div class="mark"><img src="icon.svg" alt="Pusula"/></div><div class="brand">Pusula Serve</div><p>The chip is not the bill.</p></div>
+<header><div class="ident"><div class="mark"><img src="icon.svg" alt="Pusula"/></div><div><div class="brand">Pusula Serve</div><p class="sub">LLM serving config copilot. The chip is not the bill.</p></div></div><div class="row" style="margin:0"><a href="/ops/">Ops</a><button type="button" id="share">Share</button><a href="https://x.com/pusulainfra">X</a><a href="https://github.com/PusulaInfra/pusula-serve">Repo</a></div></header>
+<div class="hero"><img src="banner.svg" alt="Pusula Serve"/></div>
 <main>
 <section class="card" style="margin-top:0"><h2>From X + upper segment</h2><div class="pills" id="plays"></div><p class="note" id="playNote"></p></section>
 <section class="grid2">
