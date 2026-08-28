@@ -5,7 +5,7 @@
 <style>
 :root{--bg:#07080c;--ink:#e8edf6;--dim:#8a93a6;--line:#262b38;--card:#10131a;--cyan:#6ee0ff;--ok:#5ee9b5;--bad:#ff6b81}
 *{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font-family:ui-sans-serif,system-ui,sans-serif}
-header,main{max-width:800px;margin:0 auto;padding:16px}
+header,main{max-width:860px;margin:0 auto;padding:16px}
 .brand{font:700 13px ui-monospace,monospace;letter-spacing:.12em;color:var(--cyan);text-transform:uppercase}
 .sub,.note{color:var(--dim);font-size:13px;line-height:1.5}
 .tabs{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
@@ -17,59 +17,68 @@ select,input{width:100%;background:#0b0e14;color:var(--ink);border:1px solid var
 .g{display:grid;grid-template-columns:1fr 1fr;gap:8px}
 .kpi{display:grid;grid-template-columns:1fr 1fr;gap:8px}.kpi b{display:block;font-size:18px;margin-top:4px}
 .ok{color:var(--ok)}.bad{color:var(--bad)}a{color:var(--cyan)}.hide{display:none}
+table{width:100%;border-collapse:collapse;font-size:13px;margin-top:8px}th,td{border-bottom:1px solid var(--line);padding:7px 4px;text-align:left}th{color:var(--dim);font-size:11px}
 </style></head><body>
 <header>
 <div class="brand">Pusula Ops</div>
-<p class="sub">Second app. Serve asks if it stands. This page asks what standing costs and whether the endpoint is burning the month. <a href="/">Serve</a></p>
+<p class="sub">Serve = sığar mı. Ops = saatlik kutu API’yi döver mi, p99 yanıyor mu, insan bekliyor mu. <a href="/">Serve</a></p>
 <div class="tabs">
 <button type="button" class="on" data-t="bill">Bill</button>
 <button type="button" data-t="slo">SLO</button>
 <button type="button" data-t="route">Route</button>
+<button type="button" data-t="pay">Pay</button>
 </div>
 </header>
 <main>
 <section id="p-bill">
 <div class="card">
-<label>Box</label>
+<label>Box $/hr</label>
 <select id="box">
 <option value="3.2">H100 ~$3.2/hr</option>
-<option value="3.8">H200 ~$3.8/hr</option>
+<option value="2.5">H100 spot ~$2.5/hr</option>
+<option value="3.44">H200 droplet ~$3.44/hr</option>
 <option value="0.7">RTX 5090 ~$0.7/hr</option>
 <option value="1.1">Spark own ~$1.1/hr</option>
 </select>
 <div class="g">
 <div><label>GPU count</label><input id="n" type="number" value="4" min="1"/></div>
 <div><label>Hours / month</label><input id="hrs" type="number" value="720"/></div>
-<div><label>Useful tok/s</label><input id="tps" type="number" value="80"/></div>
-<div><label>Idle fraction</label><input id="idle" type="number" value="0.35" step="0.05" min="0" max="0.95"/></div>
+<div><label>Peak tok/s / GPU</label><input id="tps" type="number" value="380"/></div>
+<div><label>Duty cycle 0–1</label><input id="util" type="number" value="0.40" step="0.05" min="0.05" max="1"/></div>
+<div><label>API $/M out</label><input id="api" type="number" value="0.65" step="0.05"/></div>
+<div><label>Out / in mix</label><input id="mix" type="number" value="0.35" step="0.05" min="0.05" max="1"/></div>
 </div>
+<p class="note">Duty cycle = GPU gerçekten iş yaptığı pay. Peak tok/s = doymuş batch, tek stream değil. 40% chat’te normal.</p>
 </div>
 <div class="card">
 <div class="kpi">
 <div><label>Box / month</label><b id="m-box">—</b></div>
-<div><label>Useful M tok</label><b id="m-tok">—</b></div>
-<div><label>$ / M useful</label><b id="m-unit">—</b></div>
-<div><label>Idle tax</label><b id="m-idle">—</b></div>
+<div><label>Effective $/M</label><b id="m-unit">—</b></div>
+<div><label>vs API</label><b id="m-vs">—</b></div>
+<div><label>Crossover util</label><b id="m-x">—</b></div>
 </div>
 <p class="note" id="billCut"></p>
+<table><thead><tr><th>Util</th><th>$/M box</th><th>Winner</th></tr></thead><tbody id="board"></tbody></table>
 </div>
 </section>
 <section id="p-slo" class="hide">
 <div class="card">
 <div class="g">
-<div><label>Availability target %</label><input id="slo" type="number" value="99.9" step="0.01"/></div>
+<div><label>Availability %</label><input id="slo" type="number" value="99.9" step="0.01"/></div>
 <div><label>Month minutes</label><input id="min" type="number" value="43200"/></div>
 <div><label>5xx minutes</label><input id="down" type="number" value="80"/></div>
 <div><label>TTFT p99 ms</label><input id="ttft" type="number" value="2400"/></div>
 <div><label>TTFT budget ms</label><input id="ttftb" type="number" value="800"/></div>
-<div><label>Bad TTFT share %</label><input id="badp" type="number" value="12"/></div>
+<div><label>ITL / TPOT ms</label><input id="itl" type="number" value="25"/></div>
+<div><label>OSL tokens</label><input id="osl" type="number" value="256"/></div>
+<div><label>Bad TTFT %</label><input id="badp" type="number" value="12"/></div>
 </div>
 </div>
 <div class="card">
 <div class="kpi">
-<div><label>Error budget min</label><b id="eb">—</b></div>
-<div><label>Budget left</label><b id="left">—</b></div>
+<div><label>Budget left min</label><b id="left">—</b></div>
 <div><label>Avail now</label><b id="av">—</b></div>
+<div><label>E2E ms</label><b id="e2e">—</b></div>
 <div><label>TTFT</label><b id="tf">—</b></div>
 </div>
 <p class="note" id="sloCut"></p>
@@ -77,65 +86,116 @@ select,input{width:100%;background:#0b0e14;color:var(--ink);border:1px solid var
 </section>
 <section id="p-route" class="hide">
 <div class="card">
-<label>What hits the box</label>
+<label>Workload</label>
 <select id="kind">
-<option value="infer">70B / long ctx inference</option>
-<option value="agent">tool loop / N-turn memory</option>
-<option value="embed">embed / rerank</option>
+<option value="infer">70B / long ctx decode</option>
+<option value="agent">agent N-turn + tools</option>
+<option value="embed">embed / rerank / NER</option>
+<option value="batch">overnight / 1000 docs</option>
 </select>
 <label>Host</label>
 <select id="host">
-<option value="h100">H100 / H200</option>
+<option value="h100">H100 / H200 dedicated</option>
 <option value="5090">5090 / Pro 6000</option>
 <option value="spark">DGX Spark UMA</option>
-<option value="mini">Mac Mini 16GB</option>
+<option value="mini">Mac Mini / CPU</option>
+<option value="api">managed API $/token</option>
+</select>
+<label>Small models on this GPU</label>
+<select id="many">
+<option value="1">1 model reserved</option>
+<option value="n">many small, one process, LRU evict</option>
 </select>
 <p class="note" id="routeCut"></p>
+</div>
+</section>
+<section id="p-pay" class="hide">
+<div class="card">
+<label>Is a human waiting?</label>
+<select id="wait">
+<option value="yes">yes — IDE / chat / TUI</option>
+<option value="no">no — CI, nightly, 1000 docs</option>
+<option value="mix">mix — interactive then offload</option>
+</select>
+<label>Router switches model mid-task?</label>
+<select id="aff">
+<option value="call">every call</option>
+<option value="pin">pin per task / session</option>
+</select>
+<p class="note" id="payCut"></p>
 </div>
 </section>
 </main>
 <script>
 const $=function(id){return document.getElementById(id)};
+function cpm(rate,tps,u){return (rate/(tps*3600*u))*1e6}
 function bill(){
-  const rate=+$("box").value,n=+$("n").value,hrs=+$("hrs").value,tps=+$("tps").value,idle=+$("idle").value;
-  const month=rate*n*hrs, useful=tps*(1-idle)*n*hrs*3600/1e6, unit=useful?month/useful:0, tax=month*idle;
+  const rate=+$("box").value,n=+$("n").value,hrs=+$("hrs").value,tps=+$("tps").value,u=+$("util").value,api=+$("api").value;
+  const month=rate*n*hrs;
+  const unit=cpm(rate,tps,u);
+  const x=rate/(tps*3600*(api/1e6));
+  const win=unit<api;
   $("m-box").textContent="$"+month.toFixed(0);
-  $("m-tok").textContent=useful.toFixed(0)+" M";
   $("m-unit").textContent="$"+unit.toFixed(2);
-  $("m-idle").textContent="$"+tax.toFixed(0);
-  $("billCut").textContent=idle>=0.3?("Idle tax $"+tax.toFixed(0)+"/mo. Cut ctx before another box."):("Unit $"+unit.toFixed(2)+" / M useful tok.");
+  $("m-vs").textContent=win?"BOX":"API";
+  $("m-vs").className=win?"ok":"bad";
+  $("m-x").textContent=(x*100).toFixed(0)+"%";
+  $("billCut").textContent=win
+    ?("Box wins at "+(u*100).toFixed(0)+"% duty. Keep the cards. Crossover ~"+(x*100).toFixed(0)+"%.")
+    :("API wins. "+(u*100).toFixed(0)+"% duty is theater. Crossover ~"+(x*100).toFixed(0)+"% before self-host pays.");
+  $("board").innerHTML=[0.10,0.25,0.40,0.60,0.80].map(function(v){
+    const c=cpm(rate,tps,v);
+    const w=c<api?"box":"api";
+    return "<tr><td>"+(v*100).toFixed(0)+"%</td><td>$"+c.toFixed(2)+"</td><td class='"+(w==="box"?"ok":"bad")+"'>"+w+"</td></tr>";
+  }).join("");
 }
 function slo(){
   const target=+$("slo").value/100, mins=+$("min").value, down=+$("down").value;
   const budget=mins*(1-target), left=budget-down, avail=100*(1-down/mins);
+  const e2e=+$("ttft").value+Math.max(0,+$("osl").value-1)*+$("itl").value;
   const miss=+$("ttft").value>+$("ttftb").value;
-  $("eb").textContent=budget.toFixed(0);
   $("left").textContent=left.toFixed(0);
   $("left").className=left<0?"bad":"ok";
   $("av").textContent=avail.toFixed(3)+"%";
+  $("e2e").textContent=e2e.toFixed(0);
   $("tf").textContent=miss?"OVER":"inside";
   $("tf").className=miss?"bad":"ok";
   const burn=left<0||(+$("badp").value>=10&&miss);
-  $("sloCut").textContent=burn?"Month is on fire. Freeze deploys. Cut ctx / conc, do not ship latest.":"Budget holds. tok/s is not this page.";
+  $("sloCut").textContent=burn
+    ?"Budget burning. TTFT under load is queue, not FLOPS. Shed conc before latest."
+    :("E2E ≈ TTFT + (OSL-1)×ITL = "+e2e.toFixed(0)+" ms. tok/s is not this number.");
 }
 function route(){
-  const k=$("kind").value,h=$("host").value;
+  const k=$("kind").value,h=$("host").value,m=$("many").value;
   let t="";
-  if(k==="infer"&&h==="mini")t="Mini is AGENT. 70B weights do not stand.";
-  else if(k==="infer"&&h==="spark")t="Spark infers small/quant. 256K + util 0.80 is the loop. Cap ctx.";
-  else if(k==="agent"&&(h==="h100"||h==="5090"))t="Agent on H100 wastes the FLOPS box. Put tools on Mini/CPU, infer on the GPU pool.";
-  else if(k==="embed"&&h==="h100")t="Embed on H100 is a luxury. 5090 / CPU batch is the bill.";
-  else t="Co-locate only if the host role matches the request. Split when agent steals decode.";
+  if(k==="batch"&&h==="api")t="Overnight on $/token is rush-hour pricing. Pay per hour / batch lane.";
+  else if(k==="infer"&&h==="mini")t="Mini is AGENT. 70B weights do not stand.";
+  else if(k==="infer"&&h==="spark")t="Spark small/quant only. 256K + util 0.80 is the loop.";
+  else if(k==="infer"&&h==="api")t="Human waiting + bursty chat: API until duty cycle crosses the Bill tab line.";
+  else if(k==="agent"&&(h==="h100"||h==="5090"))t="Agent loop on H100 steals decode. Tools on Mini/CPU. Pin the model per task or prefix cache dies.";
+  else if(k==="embed"&&h==="h100"&&m==="1")t="One embedder reserved 24/7 is the Superlinked bill. Many small models, one process, LRU evict.";
+  else if(k==="embed"&&m==="n")t="Correct shape: encode/score/extract share one GPU. Idle reservation was the tax.";
+  else t="Host role must match the request. Split when agent steals decode.";
   $("routeCut").textContent=t;
 }
-function paint(){bill();slo();route()}
+function pay(){
+  const w=$("wait").value,a=$("aff").value;
+  let t="";
+  if(w==="yes")t="Human waiting → pay per token / warm pool. Cold start kills the IDE.";
+  else if(w==="no")t="Nobody waiting → pay per hour or batch. 3–5 min cold start is free.";
+  else t="Interactive on token API, offload the 30 min job to a GPU-hour box.";
+  if(a==="call")t+=" Mid-task model switch drops prefix cache. Pin the session.";
+  else t+=" Affinity on. Cheap model stays cheap only if the cache stays warm.";
+  $("payCut").textContent=t;
+}
+function paint(){bill();slo();route();pay()}
 document.querySelectorAll(".tabs button").forEach(function(b){
   b.onclick=function(){
     document.querySelectorAll(".tabs button").forEach(function(x){x.className=""});
     b.className="on";
-    ["bill","slo","route"].forEach(function(t){$("p-"+t).className=b.dataset.t===t?"":"hide"});
+    ["bill","slo","route","pay"].forEach(function(t){$("p-"+t).className=b.dataset.t===t?"":"hide"});
   };
 });
-["box","n","hrs","tps","idle","slo","min","down","ttft","ttftb","badp","kind","host"].forEach(function(id){$(id).addEventListener("input",paint)});
+["box","n","hrs","tps","util","api","mix","slo","min","down","ttft","ttftb","itl","osl","badp","kind","host","many","wait","aff"].forEach(function(id){$(id).addEventListener("input",paint)});
 paint();
 </script></body></html>
