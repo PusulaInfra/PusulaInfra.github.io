@@ -8,6 +8,9 @@
 header,main{max-width:860px;margin:0 auto;padding:16px}
 .brand{font:700 13px ui-monospace,monospace;letter-spacing:.12em;color:var(--cyan);text-transform:uppercase}
 .sub,.note{color:var(--dim);font-size:13px;line-height:1.5}
+.nav{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0 0}
+.nav a{color:var(--ink);text-decoration:none;border:1px solid var(--line);background:#141821;border-radius:8px;padding:7px 10px;font-size:12px}
+.nav a.on{border-color:var(--cyan);color:var(--cyan)}
 .tabs{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
 .tabs button{border:1px solid var(--line);background:#141821;color:var(--ink);border-radius:999px;padding:8px 12px}
 .tabs button.on{border-color:var(--cyan);color:var(--cyan)}
@@ -21,7 +24,8 @@ table{width:100%;border-collapse:collapse;font-size:13px;margin-top:8px}th,td{bo
 </style></head><body>
 <header>
 <div class="brand">Pusula Ops</div>
-<p class="sub">Serve = sığar mı. Ops = saatlik kutu API’yi döver mi, p99 yanıyor mu, insan bekliyor mu. <a href="/">Serve</a></p>
+<div class="nav"><a href="/">Serve</a><a class="on" href="/ops/">Ops</a></div>
+<p class="sub">Serve = sığar mı. Ops = kutu API’yi döver mi, p99, insan bekliyor mu.</p>
 <div class="tabs">
 <button type="button" class="on" data-t="bill">Bill</button>
 <button type="button" data-t="slo">SLO</button>
@@ -48,7 +52,7 @@ table{width:100%;border-collapse:collapse;font-size:13px;margin-top:8px}th,td{bo
 <div><label>API $/M out</label><input id="api" type="number" value="0.65" step="0.05"/></div>
 <div><label>Out / in mix</label><input id="mix" type="number" value="0.35" step="0.05" min="0.05" max="1"/></div>
 </div>
-<p class="note">Duty cycle = GPU gerçekten iş yaptığı pay. Peak tok/s = doymuş batch, tek stream değil. 40% chat’te normal.</p>
+<p class="note">Duty cycle = GPU gerçekten iş yaptığı pay. Peak tok/s = doymuş batch.</p>
 </div>
 <div class="card">
 <div class="kpi">
@@ -140,9 +144,7 @@ function bill(){
   $("m-vs").textContent=win?"BOX":"API";
   $("m-vs").className=win?"ok":"bad";
   $("m-x").textContent=(x*100).toFixed(0)+"%";
-  $("billCut").textContent=win
-    ?("Box wins at "+(u*100).toFixed(0)+"% duty. Keep the cards. Crossover ~"+(x*100).toFixed(0)+"%.")
-    :("API wins. "+(u*100).toFixed(0)+"% duty is theater. Crossover ~"+(x*100).toFixed(0)+"% before self-host pays.");
+  $("billCut").textContent=win?("Box wins at "+(u*100).toFixed(0)+"% duty. Crossover ~"+(x*100).toFixed(0)+"%."):("API wins. Crossover ~"+(x*100).toFixed(0)+"% before self-host pays.");
   $("board").innerHTML=[0.10,0.25,0.40,0.60,0.80].map(function(v){
     const c=cpm(rate,tps,v);
     const w=c<api?"box":"api";
@@ -161,31 +163,25 @@ function slo(){
   $("tf").textContent=miss?"OVER":"inside";
   $("tf").className=miss?"bad":"ok";
   const burn=left<0||(+$("badp").value>=10&&miss);
-  $("sloCut").textContent=burn
-    ?"Budget burning. TTFT under load is queue, not FLOPS. Shed conc before latest."
-    :("E2E ≈ TTFT + (OSL-1)×ITL = "+e2e.toFixed(0)+" ms. tok/s is not this number.");
+  $("sloCut").textContent=burn?"Budget burning. TTFT under load is queue. Shed conc.":("E2E ≈ TTFT + (OSL-1)×ITL = "+e2e.toFixed(0)+" ms.");
 }
 function route(){
   const k=$("kind").value,h=$("host").value,m=$("many").value;
   let t="";
-  if(k==="batch"&&h==="api")t="Overnight on $/token is rush-hour pricing. Pay per hour / batch lane.";
+  if(k==="batch"&&h==="api")t="Overnight on $/token is rush-hour pricing. Pay per hour.";
   else if(k==="infer"&&h==="mini")t="Mini is AGENT. 70B weights do not stand.";
-  else if(k==="infer"&&h==="spark")t="Spark small/quant only. 256K + util 0.80 is the loop.";
-  else if(k==="infer"&&h==="api")t="Human waiting + bursty chat: API until duty cycle crosses the Bill tab line.";
-  else if(k==="agent"&&(h==="h100"||h==="5090"))t="Agent loop on H100 steals decode. Tools on Mini/CPU. Pin the model per task or prefix cache dies.";
-  else if(k==="embed"&&h==="h100"&&m==="1")t="One embedder reserved 24/7 is the Superlinked bill. Many small models, one process, LRU evict.";
-  else if(k==="embed"&&m==="n")t="Correct shape: encode/score/extract share one GPU. Idle reservation was the tax.";
-  else t="Host role must match the request. Split when agent steals decode.";
+  else if(k==="infer"&&h==="spark")t="Spark small/quant only. Cap ctx.";
+  else if(k==="infer"&&h==="api")t="Bursty chat: API until Bill tab duty cycle crosses.";
+  else if(k==="agent"&&(h==="h100"||h==="5090"))t="Agent on H100 steals decode. Pin model per task.";
+  else if(k==="embed"&&h==="h100"&&m==="1")t="One embedder reserved 24/7 is the bill. Many small, one process.";
+  else if(k==="embed"&&m==="n")t="encode/score/extract share one GPU.";
+  else t="Host role must match the request.";
   $("routeCut").textContent=t;
 }
 function pay(){
   const w=$("wait").value,a=$("aff").value;
-  let t="";
-  if(w==="yes")t="Human waiting → pay per token / warm pool. Cold start kills the IDE.";
-  else if(w==="no")t="Nobody waiting → pay per hour or batch. 3–5 min cold start is free.";
-  else t="Interactive on token API, offload the 30 min job to a GPU-hour box.";
-  if(a==="call")t+=" Mid-task model switch drops prefix cache. Pin the session.";
-  else t+=" Affinity on. Cheap model stays cheap only if the cache stays warm.";
+  let t=w==="yes"?"Human waiting → pay per token.":(w==="no"?"Nobody waiting → pay per hour.":"Interactive on token API, offload long job to GPU-hour.");
+  t+=a==="call"?" Mid-task switch drops prefix cache.":" Affinity on.";
   $("payCut").textContent=t;
 }
 function paint(){bill();slo();route();pay()}
