@@ -1,43 +1,40 @@
 <!DOCTYPE html>
 <html lang="en"><head>
-<meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
+<meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
 <title>Pusula Serve</title>
 <style>
 :root{--bg:#07080c;--ink:#e8edf6;--dim:#8a93a6;--line:#262b38;--card:#10131a;--cyan:#6ee0ff;--ok:#5ee9b5;--bad:#ff6b81;--warn:#f5c16c}
 *{box-sizing:border-box}html,body{margin:0;background:var(--bg);color:var(--ink);font-family:ui-sans-serif,system-ui,sans-serif}
 header{padding:16px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;gap:10px}
 .brand{font:700 13px ui-monospace,monospace;letter-spacing:.12em;text-transform:uppercase;color:var(--cyan)}
-.sub{color:var(--dim);font-size:13px;margin:6px 0 0;max-width:46ch}
+.sub{color:var(--dim);font-size:13px;margin:6px 0 0;max-width:48ch}
 header a{color:var(--ink);text-decoration:none;border:1px solid var(--line);background:#141821;border-radius:8px;padding:7px 10px;font-size:12px}
 main{padding:14px 16px 40px;max-width:980px;margin:0 auto}
-.grid2{display:grid;grid-template-columns:1fr;gap:10px}
-@media(min-width:820px){.grid2{grid-template-columns:1fr 1fr}}
+.grid2{display:grid;grid-template-columns:1fr;gap:10px}@media(min-width:820px){.grid2{grid-template-columns:1fr 1fr}}
 .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px;margin-top:10px}
 h2{margin:0 0 10px;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--dim)}
 label{display:block;font-size:11px;color:var(--dim);letter-spacing:.08em;text-transform:uppercase;margin:8px 0 4px}
 select,input{width:100%;background:#0b0e14;color:var(--ink);border:1px solid var(--line);border-radius:10px;padding:10px;font-size:16px}
-.pills{display:flex;flex-wrap:wrap;gap:6px}
-.pills button{border:1px solid var(--line);background:#0b0e14;color:var(--dim);border-radius:999px;padding:7px 10px;font-size:12px}
-.kpi{display:grid;grid-template-columns:1fr 1fr;gap:8px}.kpi b{display:block;font-size:20px;margin-top:4px}
+.pills{display:flex;flex-wrap:wrap;gap:6px}.pills button{border:1px solid var(--line);background:#0b0e14;color:var(--dim);border-radius:999px;padding:7px 10px;font-size:12px}
+.kpi{display:grid;grid-template-columns:1fr 1fr;gap:8px}.kpi b{display:block;font-size:18px;margin-top:4px}
 .bar{display:flex;height:16px;border-radius:99px;overflow:hidden;background:#1b2130;margin:10px 0}.bar i{display:block;height:100%}
 .w{background:var(--cyan)}.k{background:var(--warn)}.r{background:#b39bff}.h{background:#2a3144}
-.ok{color:var(--ok)}.bad{color:var(--bad)}
+.ok{color:var(--ok)}.bad{color:var(--bad)}.note{color:var(--dim);font-size:13px;line-height:1.5;margin:8px 0 0}
 table{width:100%;border-collapse:collapse;font-size:13px}th,td{border-bottom:1px solid var(--line);padding:8px 6px;text-align:left}th{color:var(--dim);font-size:11px}
 pre{margin:0;white-space:pre-wrap;font:12px/1.45 ui-monospace,monospace;color:var(--cyan);background:#0b0e14;border:1px solid var(--line);border-radius:10px;padding:12px}
-.note{color:var(--dim);font-size:13px;line-height:1.5;margin:8px 0 0}
-.row{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
-.row button{flex:1;min-width:110px;border:1px solid var(--line);background:#141821;color:var(--ink);border-radius:10px;padding:10px}
-.node{border:1px solid var(--line);border-radius:10px;padding:10px;margin:6px 0;background:#0b0e14;display:flex;justify-content:space-between;gap:8px}
+.row{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}.row button{flex:1;min-width:110px;border:1px solid var(--line);background:#141821;color:var(--ink);border-radius:10px;padding:10px}
+.node{border:1px solid var(--line);border-radius:10px;padding:10px;margin:6px 0;background:#0b0e14;display:flex;justify-content:space-between}
 </style></head><body>
-<header><div><div class="brand">Pusula Serve</div><p class="sub">Scenes taken from X this week. Cut the flag that actually failed.</p></div><div class="row" style="margin:0"><a href="https://x.com/pusulainfra">X</a><a href="https://github.com/PusulaInfra/pusula-serve">Repo</a></div></header>
+<header><div><div class="brand">Pusula Serve</div><p class="sub">Upper-segment serving plan: P/D split, multi-LoRA, spec tax, ISL/OSL. Not Dynamo. The chip is not the bill.</p></div><div class="row" style="margin:0"><a href="https://x.com/pusulainfra">X</a><a href="https://github.com/PusulaInfra/pusula-serve">Repo</a></div></header>
 <main>
-<section class="card" style="margin-top:0"><h2>From X</h2><div class="pills" id="plays"></div><p class="note" id="playNote"></p></section>
+<section class="card" style="margin-top:0"><h2>From X + upper segment</h2><div class="pills" id="plays"></div><p class="note" id="playNote"></p></section>
 <section class="grid2">
 <div class="card"><h2>Workload</h2>
 <label>Model</label><select id="model"></select>
 <div class="grid2"><div><label>Weights</label><select id="wbit"><option value="2">BF16</option><option value="1">FP8</option><option value="0.5">Q4 / NVFP4</option></select></div><div><label>KV</label><select id="kbit"><option value="2">BF16 KV</option><option value="1">FP8 KV</option></select></div></div>
 <div class="grid2"><div><label>max-model-len</label><input id="ctx" type="number" value="16384"/></div><div><label>concurrent</label><input id="seqs" type="number" value="16"/></div></div>
+<div class="grid2"><div><label>ISL prompt</label><input id="isl" type="number" value="2048"/></div><div><label>OSL decode</label><input id="osl" type="number" value="256"/></div></div>
+<div class="grid2"><div><label>LoRA adapters</label><input id="lora" type="number" value="0" min="0"/></div><div><label>Spec draft tokens</label><input id="spec" type="number" value="0" min="0" max="8"/></div></div>
 <label>Prefix hit <span id="hitv">0%</span></label><input id="hit" type="range" min="0" max="90" step="5" value="0"/>
 <label>Engine</label><select id="engine"><option value="vllm">vLLM</option><option value="sglang">SGLang</option><option value="mlx">MLX</option></select>
 </div>
@@ -48,9 +45,18 @@ pre{margin:0;white-space:pre-wrap;font:12px/1.45 ui-monospace,monospace;color:va
 <div class="kpi"><div><label>Weights</label><b id="m-w">—</b></div><div><label>KV</label><b id="m-k">—</b></div><div><label>Per device</label><b id="m-p">—</b></div><div><label>Fit conc</label><b id="m-s">—</b></div></div>
 <p id="health" class="ok"></p><p class="note" id="cut"></p>
 </div></section>
-<section class="card"><h2>1 / 4 / 16 / 32 concurrent</h2>
-<table><thead><tr><th>Conc</th><th>KV</th><th>Per device</th><th>Fit</th></tr></thead><tbody id="board"></tbody></table>
-<p class="note">A 1-conc screenshot is marketing. Agent stacks die in the 16/32 columns.</p></section>
+<section class="card"><h2>Upper segment decision</h2>
+<div class="kpi">
+<div><label>Shape</label><b id="shape">—</b></div>
+<div><label>P/D split?</label><b id="pd">—</b></div>
+<div><label>LoRA tax</label><b id="ltax">—</b></div>
+<div><label>Spec tax</label><b id="stax">—</b></div>
+</div>
+<p class="note" id="pdNote"></p>
+<p class="note">Dynamo / NIM / llm-d / vLLM production-stack run the pools. This page only says whether the split is worth the second pool.</p>
+</section>
+<section class="card"><h2>1 / 4 / 16 / 32</h2>
+<table><thead><tr><th>Conc</th><th>KV</th><th>Per device</th><th>Fit</th></tr></thead><tbody id="board"></tbody></table></section>
 <section class="card"><h2>Fleet</h2>
 <div class="row"><button type="button" id="add5090">+ 5090</button><button type="button" id="addSpark">+ Spark</button><button type="button" id="addStudio">+ Studio</button><button type="button" id="addMini">+ Mini</button><button type="button" id="addPro">+ Pro 6000</button></div>
 <div id="fleet"></div><p class="note" id="fleetNote"></p></section>
@@ -58,49 +64,51 @@ pre{margin:0;white-space:pre-wrap;font:12px/1.45 ui-monospace,monospace;color:va
 <div class="card"><h2>Launch</h2><div class="row"><button type="button" id="copy">Copy</button><button type="button" id="tweet">Post on X</button></div><pre id="cmd"></pre></div>
 <div class="card"><h2>Ask</h2><div class="pills" id="asks">
 <button type="button" data-q="stand">Stand up?</button>
-<button type="button" data-q="prefix">Prefix 0%?</button>
+<button type="button" data-q="pd">Buy P/D?</button>
+<button type="button" data-q="lora">One replica per LoRA?</button>
 <button type="button" data-q="cpu">Sell CPUs?</button>
-<button type="button" data-q="spark">Spark leak?</button>
-<button type="button" data-q="metric">Is tok/s fake?</button>
+<button type="button" data-q="metric">tok/s fake?</button>
 </div><p class="note" id="ans"></p></div>
 </section>
 </main>
 <script>
-const MODELS=[{id:"qwen3-8b",name:"Qwen3 8B",hf:"Qwen/Qwen3-8B",params:8,layers:36,kvHeads:8,headDim:128,attn:"gqa",moe:false,active:8},{id:"qwen3-32b",name:"Qwen3 32B",hf:"Qwen/Qwen3-32B",params:32.5,layers:64,kvHeads:8,headDim:128,attn:"gqa",moe:false,active:32.5},{id:"qwen-2.5-72b",name:"Qwen2.5 72B",hf:"Qwen/Qwen2.5-72B-Instruct",params:72.7,layers:80,kvHeads:8,headDim:128,attn:"gqa",moe:false,active:72.7},{id:"llama-3.3-70b",name:"Llama 3.3 70B",hf:"meta-llama/Llama-3.3-70B-Instruct",params:70.6,layers:80,kvHeads:8,headDim:128,attn:"gqa",moe:false,active:70.6},{id:"mixtral-8x22b",name:"Mixtral 8x22B",hf:"mistralai/Mixtral-8x22B-Instruct-v0.1",params:141,layers:56,kvHeads:8,headDim:128,attn:"gqa",moe:true,active:39},{id:"deepseek-v3",name:"DeepSeek-V3",hf:"deepseek-ai/DeepSeek-V3",params:671,layers:61,kvHeads:1,headDim:128,attn:"mla",moe:true,active:37,latent:512,rope:64}];
-const NODES=[{id:"H100",name:"H100 80GB",vram:80,kind:"cuda",util:0.90,role:"infer"},{id:"H200",name:"H200 141GB",vram:141,kind:"cuda",util:0.90,role:"infer"},{id:"RTX5090",name:"RTX 5090 32GB",vram:32,kind:"cuda",util:0.88,role:"infer"},{id:"RTX4090",name:"RTX 4090 24GB",vram:24,kind:"cuda",util:0.88,role:"infer"},{id:"PRO6000",name:"RTX Pro 6000 96GB",vram:96,kind:"cuda",util:0.90,role:"infer"},{id:"SPARK",name:"DGX Spark GB10 128 UMA",vram:128,kind:"uma",util:0.70,role:"infer"},{id:"STUDIO",name:"Mac Studio 512 unified",vram:192,kind:"apple",util:0.55,role:"either"},{id:"MINI",name:"Mac Mini 16GB",vram:12,kind:"apple",util:0.50,role:"agent"}];
+const MODELS=[{id:"qwen3-32b",name:"Qwen3 32B",hf:"Qwen/Qwen3-32B",params:32.5,layers:64,kvHeads:8,headDim:128,attn:"gqa",moe:false,active:32.5},{id:"qwen-2.5-72b",name:"Qwen2.5 72B",hf:"Qwen/Qwen2.5-72B-Instruct",params:72.7,layers:80,kvHeads:8,headDim:128,attn:"gqa",moe:false,active:72.7},{id:"llama-3.3-70b",name:"Llama 3.3 70B",hf:"meta-llama/Llama-3.3-70B-Instruct",params:70.6,layers:80,kvHeads:8,headDim:128,attn:"gqa",moe:false,active:70.6},{id:"mixtral-8x22b",name:"Mixtral 8x22B",hf:"mistralai/Mixtral-8x22B-Instruct-v0.1",params:141,layers:56,kvHeads:8,headDim:128,attn:"gqa",moe:true,active:39},{id:"deepseek-v3",name:"DeepSeek-V3",hf:"deepseek-ai/DeepSeek-V3",params:671,layers:61,kvHeads:1,headDim:128,attn:"mla",moe:true,active:37,latent:512,rope:64},{id:"qwen3-8b",name:"Qwen3 8B",hf:"Qwen/Qwen3-8B",params:8,layers:36,kvHeads:8,headDim:128,attn:"gqa",moe:false,active:8}];
+const NODES=[{id:"H100",name:"H100 80GB",vram:80,kind:"cuda",util:0.90,role:"infer",flop:1},{id:"H200",name:"H200 141GB",vram:141,kind:"cuda",util:0.90,role:"infer",flop:0.9},{id:"RTX5090",name:"RTX 5090 32GB",vram:32,kind:"cuda",util:0.88,role:"infer",flop:0.7},{id:"PRO6000",name:"RTX Pro 6000 96GB",vram:96,kind:"cuda",util:0.90,role:"infer",flop:0.85},{id:"SPARK",name:"DGX Spark GB10 128 UMA",vram:128,kind:"uma",util:0.70,role:"infer",flop:0.4},{id:"STUDIO",name:"Mac Studio 512 unified",vram:192,kind:"apple",util:0.55,role:"either",flop:0.3},{id:"MINI",name:"Mac Mini 16GB",vram:12,kind:"apple",util:0.50,role:"agent",flop:0.1}];
 const PLAYS=[
-{id:"prefix0",t:"Prefix 0% theater",n:"@pusulainfra: if the prefix is not stable, KV reuse never hits and every turn rewrites the expensive part. Slider at 0% is the real bill."},
-{id:"moe256k",t:"MoE + 256K open",n:"@pusulainfra: 125B sits, 6B runs per token. Native 256K still grows KV on HBM. Cheap tokens are not free context."},
-{id:"holdcpu",t:"Sold the CPUs",n:"@pusulainfra: GPU got the model. CPU ate prefix tables, tokenizer, scheduler. Scrap CPU nodes to fund one GPU, then stall on host RAM."},
-{id:"latest",t:"Pulled latest",n:"@pusulainfra: pin an image, pull latest, inherit new cache defaults. Same weights, different OOM. Diff flags. Replay traffic."},
-{id:"active",t:"Active ≠ capacity",n:"@pusulainfra: 18B active looks cheap. Long context still grows sparse KV pages. max_model_len because the card supports it is how you OOM."},
-{id:"nturn",t:"N-turn, do not manage",n:"@pusulainfra: concurrency arrives, managing the window is not enough. Cut max-model-len."},
-{id:"spark256",t:"Spark 256K leak",n:"Field: GB10 vLLM crash loop, RestartCount 238, 85-105GB pinned after death. util 0.80 + 256K is not a serving plan."},
-{id:"weightsok",t:"Weights fit, still OOM",n:"X interview circuit: Llama fits, 1000 users do not. KV is the dynamic bill. Read the 16/32 columns."},
-{id:"k2",t:"Thinking model on 8xH100",n:"Field: K2-class thinking OOMed until FP8 KV and seq 1024. Two hours of flags, not a bigger box first."},
-{id:"glm503",t:"503K ctx, 8 running",n:"Field GLM Flash: context 503000 but max-running-requests 8 and radix cache off. Long ctx is a concurrency cap."},
-{id:"mamba",t:"Mamba prefix 0% hit",n:"Field: scheduler block 816 vs Mamba state 1648. APC reuse drops to 0%. Prefix flag on is not prefix working."},
-{id:"metric",t:"tok/s includes cache",n:"Field: vLLM throughput counts prefix hits. That number is cache behaviour, not generated work."}
+{id:"pd",t:"P/D split",n:"Upper segment 2026 default question. Prefill wants FLOPS. Decode wants HBM. Co-locate until long prompts stall decode. Then two pools + KV transfer (NIXL / Dynamo / llm-d)."},
+{id:"lora",t:"Multi-LoRA",n:"Do not stand one replica per fine-tune. Adapters are small. Base weights are the bill. Count adapters, do not multiply boxes."},
+{id:"spec",t:"Spec decode tax",n:"Draft tokens buy decode speed and spend extra weights + verify batch. Acceptance 3–5 is a win. Acceptance ~1 is a second model you feed for free."},
+{id:"prefix0",t:"Prefix 0%",n:"@pusulainfra: unstable prefix means every turn rewrites the expensive part."},
+{id:"moe256k",t:"MoE + 256K",n:"@pusulainfra: cheap tokens, native context still grows KV."},
+{id:"holdcpu",t:"Sold the CPUs",n:"@pusulainfra: prefix tables live on the host."},
+{id:"spark256",t:"Spark 256K leak",n:"Field: util 0.80 + 256K crash loop. Cap ctx."},
+{id:"weightsok",t:"Weights fit, OOM",n:"KV is the dynamic bill. Read 16/32."},
+{id:"glm503",t:"503K / 8 running",n:"Long ctx is a concurrency cap, not a feature flag."},
+{id:"metric",t:"tok/s includes cache",n:"Prefix hits are cache behaviour, not generated work."}
 ];
 let fleet=[]; const $=function(id){return document.getElementById(id)};
 function kvB(s,b){return s.attn==="mla"?s.layers*((s.latent||512)+(s.rope||64))*b:2*s.layers*s.kvHeads*s.headDim*b}
 function pickTP(n,layers,w,kv,usable){for(let tp=n;tp>=1;tp=Math.floor(tp/2)||1){if(n%tp!==0){if(tp===1)break;continue;}const pp=n/tp;if(pp>layers){if(tp===1)break;continue;}if((w/(tp*pp)+kv/tp)<=usable)return[tp,pp];if(tp===1)break;}return[n,1]}
-function runAt(seqs){const spec=MODELS.find(function(m){return m.id===$("model").value});const node=NODES.find(function(g){return g.id===$("gpu").value});const wbit=+$("wbit").value,kbit=+$("kbit").value,ctx=+$("ctx").value,n=+$("gpus").value,hit=+$("hit").value/100;const rt=$("engine").value==="sglang"?2.4:($("engine").value==="mlx"?1.6:2.2);const weight=spec.params*wbit;const kv=(kvB(spec,kbit)*ctx*seqs*(1-hit*0.75))/(1024**3);const usable=node.vram*node.util;const p=pickTP(n,spec.layers,weight,kv,usable);const per=weight/(p[0]*p[1])+kv/p[0]+rt;return{spec:spec,node:node,n:n,weight:weight,kv:kv,rt:rt,per:per,usable:usable,oom:per>usable,tp:p[0],pp:p[1],ctx:ctx,seqs:seqs}}
+function loraGB(spec,n){return n?Math.min(24,n*spec.params*0.02):0}
+function specGB(spec,d){return d?spec.params*0.12:0}
+function runAt(seqs){const spec=MODELS.find(function(m){return m.id===$("model").value});const node=NODES.find(function(g){return g.id===$("gpu").value});const wbit=+$("wbit").value,kbit=+$("kbit").value,ctx=+$("ctx").value,n=+$("gpus").value,hit=+$("hit").value/100;const rt=$("engine").value==="sglang"?2.4:($("engine").value==="mlx"?1.6:2.2);const extra=loraGB(spec,+$("lora").value)+specGB(spec,+$("spec").value);const weight=spec.params*wbit+extra;const kv=(kvB(spec,kbit)*ctx*seqs*(1-hit*0.75))/(1024**3);const usable=node.vram*node.util;const p=pickTP(n,spec.layers,weight,kv,usable);const per=weight/(p[0]*p[1])+kv/p[0]+rt;return{spec:spec,node:node,n:n,weight:weight,kv:kv,rt:rt,per:per,usable:usable,oom:per>usable,tp:p[0],pp:p[1],ctx:ctx,seqs:seqs,extra:extra}}
 function bestSeqs(){let lo=0,hi=4096,best=0;while(lo<=hi){const mid=(lo+hi)>>1;if(!mid){lo=1;continue;}if(!runAt(mid).oom){best=mid;lo=mid+1;}else hi=mid-1;}return best}
-function analyze(){const a=runAt(+$("seqs").value);a.best=bestSeqs();if(a.node.role==="agent")a.cut="Agent host. Do not put 70B weights here.";else if(a.oom&&a.best>=1)a.cut="Cut concurrent to "+a.best+" before another GPU.";else if(a.oom)a.cut="Will not stand. Q4 or cap max-model-len.";else if(+$("hit").value===0&&a.kv>8)a.cut="Prefix hit is 0%. Reuse is theater until the prefix is stable.";else if(a.kv>a.weight*0.5)a.cut="KV is the bill. Cap max-model-len.";else if(a.spec.moe)a.cut="Loaded "+a.spec.params+"B stays. Active "+a.spec.active+"B is not capacity.";else if(a.node.kind==="uma")a.cut="UMA util "+a.node.util+". 256K on Spark is how VRAM pins after death.";else a.cut="Fits. Diff flags before pull latest.";return a}
-function cmd(a){if(a.node.kind==="apple"||$("engine").value==="mlx")return "mlx_lm.server --model "+a.spec.hf+" --max-tokens "+a.ctx;if($("engine").value==="sglang")return "python3 -m sglang.launch_server --model-path "+a.spec.hf+" --context-length "+a.ctx+" --tp-size "+a.tp+" --mem-fraction-static "+a.node.util.toFixed(2)+" --max-running-requests "+a.seqs;return "vllm serve "+a.spec.hf+" --max-model-len "+a.ctx+" --tensor-parallel-size "+a.tp+" --pipeline-parallel-size "+a.pp+" --gpu-memory-utilization "+a.node.util.toFixed(2)+" --max-num-seqs "+a.seqs+" --enable-prefix-caching"}
-function paint(){$("hitv").textContent=$("hit").value+"%";const a=analyze();const wp=a.weight/(a.tp*a.pp),kp=a.kv/a.tp,sum=Math.max(a.usable,wp+kp+a.rt);$("stack").innerHTML='<i class="w" style="width:'+(100*wp/sum)+'%"></i><i class="k" style="width:'+(100*kp/sum)+'%"></i><i class="r" style="width:'+(100*a.rt/sum)+'%"></i><i class="h" style="width:'+Math.max(0,100*(a.usable-wp-kp-a.rt)/sum)+'%"></i>';$("m-w").textContent=a.weight.toFixed(1)+" GB";$("m-k").textContent=a.kv.toFixed(1)+" GB";$("m-p").textContent=a.per.toFixed(1)+" GB";$("m-s").textContent=String(a.best);$("health").className=a.oom?"bad":"ok";$("health").textContent=a.oom?("WILL NOT STAND · "+a.per.toFixed(1)+" > "+a.usable.toFixed(1)):("HEADROOM "+(a.usable-a.per).toFixed(1)+" GB · TP "+a.tp);$("cut").textContent=a.cut;$("nodeNote").textContent=a.node.name+" · "+a.node.kind+" · util "+Math.round(a.node.util*100)+"%";$("cmd").textContent=cmd(a);$("board").innerHTML=[1,4,16,32].map(function(c){const x=runAt(c);return "<tr><td>"+c+"</td><td>"+x.kv.toFixed(1)+" GB</td><td>"+x.per.toFixed(1)+" GB</td><td class='"+(x.oom?"bad":"ok")+"'>"+(x.oom?"no":"yes")+"</td></tr>"}).join("");renderFleet()}
-function nodeFit(node){const spec=MODELS.find(function(m){return m.id===$("model").value});const weight=spec.params*+$("wbit").value;const kv=(kvB(spec,+$("kbit").value)*+$("ctx").value*+$("seqs").value*(1-+$("hit").value/100*0.75))/(1024**3);const usable=node.vram*node.util;return{infer:node.role!=="agent"&&(weight+kv+2)<=usable,per:weight+kv+2,usable:usable}}
-function renderFleet(){if(!fleet.length){$("fleet").innerHTML="<p class='note'>Empty.</p>";$("fleetNote").textContent="";return}$("fleet").innerHTML=fleet.map(function(id,i){const n=NODES.find(function(x){return x.id===id});const f=nodeFit(n);const tag=f.infer?"INFER":(n.role==="agent"?"AGENT ONLY":"TOO SMALL");return "<div class='node'><div><b>"+n.name+"</b><span class='note'> "+tag+"</span></div><button type='button' data-i='"+i+"'>remove</button></div>"}).join("")}
-function answer(q){const a=analyze();const map={stand:a.oom?("No. Fit conc ≈ "+a.best+"."):("Yes. Still publish 16 and 32."),prefix:(+$("hit").value===0)?"Hit 0%. Prefix-cache is a flag, not a hit rate.":("Hit "+$("hit").value+"% only if the prefix repeats."),cpu:"Hold the CPUs. Prefix tables live on the host.",spark:"Spark 256K + util 0.80 is the crash-loop recipe. Cap ctx and concurrent. Reboot is not a flag.",metric:"If tok/s includes prefix hits, the number is cache, not work."};$("ans").textContent=map[q]}
-function applyPlay(id){const s={prefix0:{hit:0,seqs:16,ctx:32768,model:"llama-3.3-70b",gpu:"H100",gpus:4,wbit:"2"},moe256k:{model:"deepseek-v3",ctx:262144,seqs:8,wbit:"1",gpu:"H200",gpus:8,hit:0},holdcpu:{gpu:"MINI",model:"qwen3-8b",seqs:8,ctx:8192},latest:{hit:0,seqs:32,ctx:16384,model:"llama-3.3-70b",gpu:"H100",gpus:4,wbit:"2"},active:{model:"deepseek-v3",ctx:65536,seqs:16,wbit:"1",gpu:"H100",gpus:4},nturn:{ctx:8192,seqs:32,hit:20,model:"qwen-2.5-72b",gpu:"H100",gpus:4},spark256:{gpu:"SPARK",gpus:1,ctx:262144,seqs:8,model:"qwen3-32b",wbit:"0.5"},weightsok:{model:"llama-3.3-70b",wbit:"2",gpu:"H100",gpus:1,seqs:64,ctx:32768},k2:{model:"llama-3.3-70b",gpu:"H100",gpus:8,seqs:8,ctx:1024,wbit:"2",kbit:"1"},glm503:{model:"qwen-2.5-72b",ctx:503000,seqs:8,gpu:"H200",gpus:4,wbit:"1",engine:"sglang"},mamba:{hit:0,model:"qwen3-32b",gpu:"H100",gpus:2,seqs:16,ctx:16384},metric:{hit:70,model:"llama-3.3-70b",gpu:"H100",gpus:4,seqs:16,ctx:16384}}[id];if(!s)return;Object.keys(s).forEach(function(k){if($(k))$(k).value=s[k]});}
-$("model").innerHTML=MODELS.map(function(m){return "<option value='"+m.id+"'>"+m.name+(m.moe?" · MoE":"")+"</option>"}).join("");
+function shape(){const isl=+$("isl").value,osl=+$("osl").value;if(isl>osl*4)return "prefill-heavy";if(osl>isl*2)return "decode-heavy";return "balanced"}
+function pdCall(a){const sh=shape();const big=a.spec.params>=70;const long=+$("isl").value>=4096;const hot=+$("seqs").value>=16;if(a.n<4)return {v:"no",n:"Under 4 GPUs the second pool is theater. Co-locate. Chunked prefill first."};if((big||long)&&hot)return {v:"yes",n:"P/D is the upper-segment move. Prefill pool on FLOPS (H100). Decode pool on HBM (H200). KV transfer is the new bill — NIXL/Dynamo, not a flag."};if(sh==="prefill-heavy")return {v:"maybe",n:"Long prompts stall decode if co-located. Split only after you measure TTFT vs ITL."};return {v:"no",n:"Co-locate. Disagg doubles GPU count. Complexity is the cost."}}
+function analyze(){const a=runAt(+$("seqs").value);a.best=bestSeqs();a.sh=shape();a.pd=pdCall(a);if(a.node.role==="agent")a.cut="Agent host. No 70B weights.";else if(a.oom&&a.best>=1)a.cut="Cut concurrent to "+a.best+".";else if(a.oom)a.cut="Will not stand. Q4 or cap ctx.";else if(+$("hit").value===0&&a.kv>8)a.cut="Prefix 0%. Reuse is theater.";else if(a.kv>a.weight*0.5)a.cut="KV is the bill. Cap max-model-len.";else if(+$("lora").value>8)a.cut="Multi-LoRA on one base. Do not buy one box per adapter.";else if(a.pd.v==="yes")a.cut="Fits co-located. Next spend is a decode pool, not a fifth H100 in the same process.";else a.cut="Fits. Diff flags before latest.";return a}
+function cmd(a){if(a.node.kind==="apple"||$("engine").value==="mlx")return "mlx_lm.server --model "+a.spec.hf;var c="vllm serve "+a.spec.hf+" --max-model-len "+a.ctx+" --tensor-parallel-size "+a.tp+" --gpu-memory-utilization "+a.node.util.toFixed(2)+" --max-num-seqs "+a.seqs+" --enable-prefix-caching";if(+$("lora").value)c+=" --enable-lora --max-loras "+$("lora").value;if(+$("spec").value)c+="  # speculative draft tokens="+$("spec").value+" — measure accept length before keeping";if(a.pd.v==="yes")c+="\n# P/D: second pool + --kv-transfer-config NixlConnector. Dynamo/llm-d owns routing.";return c}
+function paint(){$("hitv").textContent=$("hit").value+"%";const a=analyze();const wp=a.weight/(a.tp*a.pp),kp=a.kv/a.tp,sum=Math.max(a.usable,wp+kp+a.rt);$("stack").innerHTML='<i class="w" style="width:'+(100*wp/sum)+'%"></i><i class="k" style="width:'+(100*kp/sum)+'%"></i><i class="r" style="width:'+(100*a.rt/sum)+'%"></i><i class="h" style="width:'+Math.max(0,100*(a.usable-wp-kp-a.rt)/sum)+'%"></i>';$("m-w").textContent=a.weight.toFixed(1)+" GB";$("m-k").textContent=a.kv.toFixed(1)+" GB";$("m-p").textContent=a.per.toFixed(1)+" GB";$("m-s").textContent=String(a.best);$("health").className=a.oom?"bad":"ok";$("health").textContent=a.oom?("WILL NOT STAND · "+a.per.toFixed(1)+" > "+a.usable.toFixed(1)):("HEADROOM "+(a.usable-a.per).toFixed(1)+" GB");$("cut").textContent=a.cut;$("nodeNote").textContent=a.node.name+" · "+a.node.kind;$("cmd").textContent=cmd(a);$("shape").textContent=a.sh;$("pd").textContent=a.pd.v;$("pd").className=a.pd.v==="yes"?"ok":(a.pd.v==="maybe"?"":"ok");$("ltax").textContent=loraGB(a.spec,+$("lora").value).toFixed(1)+" GB";$("stax").textContent=specGB(a.spec,+$("spec").value).toFixed(1)+" GB";$("pdNote").textContent=a.pd.n;$("board").innerHTML=[1,4,16,32].map(function(c){const x=runAt(c);return "<tr><td>"+c+"</td><td>"+x.kv.toFixed(1)+"</td><td>"+x.per.toFixed(1)+"</td><td class='"+(x.oom?"bad":"ok")+"'>"+(x.oom?"no":"yes")+"</td></tr>"}).join("");renderFleet()}
+function nodeFit(node){const spec=MODELS.find(function(m){return m.id===$("model").value});const weight=spec.params*+$("wbit").value+loraGB(spec,+$("lora").value);const kv=(kvB(spec,+$("kbit").value)*+$("ctx").value*+$("seqs").value*(1-+$("hit").value/100*0.75))/(1024**3);return{infer:node.role!=="agent"&&(weight+kv+2)<=node.vram*node.util}}
+function renderFleet(){if(!fleet.length){$("fleet").innerHTML="<p class='note'>Empty.</p>";return}$("fleet").innerHTML=fleet.map(function(id,i){const n=NODES.find(function(x){return x.id===id});const tag=nodeFit(n).infer?"INFER":(n.role==="agent"?"AGENT":"SMALL");return "<div class='node'><div><b>"+n.name+"</b> "+tag+"</div><button type='button' data-i='"+i+"'>remove</button></div>"}).join("")}
+function answer(q){const a=analyze();const map={stand:a.oom?("No. Fit ≈ "+a.best):"Yes. Publish 16/32.",pd:a.pd.n,lora:(+$("lora").value?($("lora").value+" adapters on one base. Do not multiply replicas."):"Zero adapters. Multi-LoRA is how enterprises stop buying a box per team."),cpu:"Hold the CPUs.",metric:"tok/s with prefix hits is cache, not work."};$("ans").textContent=map[q]}
+function applyPlay(id){const s={pd:{model:"llama-3.3-70b",gpu:"H100",gpus:8,ctx:32768,seqs:24,isl:8192,osl:128,wbit:"2"},lora:{model:"llama-3.3-70b",gpu:"H100",gpus:4,lora:16,seqs:16,ctx:8192},spec:{model:"qwen3-32b",gpu:"RTX5090",gpus:1,spec:4,wbit:"0.5",seqs:8,ctx:16384},prefix0:{hit:0,seqs:16,ctx:32768,model:"llama-3.3-70b",gpu:"H100",gpus:4},moe256k:{model:"deepseek-v3",ctx:262144,seqs:8,wbit:"1",gpu:"H200",gpus:8,hit:0},holdcpu:{gpu:"MINI",model:"qwen3-8b"},spark256:{gpu:"SPARK",gpus:1,ctx:262144,seqs:8,model:"qwen3-32b",wbit:"0.5"},weightsok:{model:"llama-3.3-70b",wbit:"2",gpu:"H100",gpus:1,seqs:64,ctx:32768},glm503:{model:"qwen-2.5-72b",ctx:503000,seqs:8,gpu:"H200",gpus:4,wbit:"1"},metric:{hit:70,model:"llama-3.3-70b",gpu:"H100",gpus:4}}[id];if(!s)return;Object.keys(s).forEach(function(k){if($(k))$(k).value=s[k]})}
+$("model").innerHTML=MODELS.map(function(m){return "<option value='"+m.id+"'>"+m.name+"</option>"}).join("");
 $("gpu").innerHTML=NODES.map(function(n){return "<option value='"+n.id+"'>"+n.name+"</option>"}).join("");
-$("model").value="qwen3-32b";$("gpu").value="RTX5090";$("gpus").value="1";$("wbit").value="0.5";
+$("model").value="llama-3.3-70b";$("gpu").value="H100";
 $("plays").innerHTML=PLAYS.map(function(p){return "<button type='button' data-id='"+p.id+"'>"+p.t+"</button>"}).join("");
 $("playNote").textContent=PLAYS[0].n;
-$("plays").addEventListener("click",function(e){const b=e.target.closest("button");if(!b)return;const p=PLAYS.find(function(x){return x.id===b.dataset.id});$("playNote").textContent=p.n;applyPlay(p.id);paint()});
-["model","wbit","kbit","ctx","seqs","hit","engine","gpu","gpus"].forEach(function(id){$(id).addEventListener("input",paint)});
+$("plays").addEventListener("click",function(e){const b=e.target.closest("button");if(!b)return;$("playNote").textContent=PLAYS.find(function(x){return x.id===b.dataset.id}).n;applyPlay(b.dataset.id);paint()});
+["model","wbit","kbit","ctx","seqs","hit","engine","gpu","gpus","isl","osl","lora","spec"].forEach(function(id){$(id).addEventListener("input",paint)});
 $("asks").addEventListener("click",function(e){const b=e.target.closest("button");if(b&&b.dataset.q)answer(b.dataset.q)});
 $("copy").onclick=function(){navigator.clipboard.writeText($("cmd").textContent)};
 $("tweet").onclick=function(){const a=analyze();window.open("https://x.com/intent/tweet?text="+encodeURIComponent(a.cut+"\nThe chip is not the bill.\nhttps://pusulainfra.github.io/"),"_blank")};
