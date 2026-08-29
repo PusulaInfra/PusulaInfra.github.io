@@ -35,9 +35,10 @@ pre{margin:0;white-space:pre-wrap;font:12px/1.45 ui-monospace,monospace;color:va
 #boot.hide{opacity:0;pointer-events:none}
 #boot .mark{width:64px;height:64px;border-radius:16px}
 #boot p{margin:0;color:var(--dim);font-size:13px}
+header a[href="#desk"]{border-color:var(--cyan);color:var(--cyan)}
 </style></head><body>
 <div id="boot"><div class="mark"><img src="icon.svg" alt="Pusula"/></div><div class="brand">Pusula Serve</div><p>The chip is not the bill.</p></div>
-<header><div class="ident"><div class="mark"><img src="icon.svg" alt="Pusula"/></div><div><div class="brand">Pusula Serve</div><p class="sub">LLM serving config copilot. The chip is not the bill.</p></div></div><div class="row" style="margin:0"><a href="/ops/">Ops</a><button type="button" id="share">Share</button><a href="https://x.com/pusulainfra">X</a><a href="https://github.com/PusulaInfra/pusula-serve">Repo</a></div></header>
+<header><div class="ident"><div class="mark"><img src="icon.svg" alt="Pusula"/></div><div><div class="brand">Pusula Serve</div><p class="sub">LLM serving config copilot. The chip is not the bill.</p></div></div><div class="row" style="margin:0"><a href="/ops/">Ops</a><button type="button" id="share">Share</button><a href="#desk">Desk</a><a href="https://x.com/pusulainfra">X</a><a href="https://youtube.com/@pusulainfra">YouTube</a><a href="https://github.com/PusulaInfra/pusula-serve">Repo</a></div></header>
 <div class="hero"><img src="banner.svg" alt="Pusula Serve"/></div>
 <main>
 <section class="card" style="margin-top:0"><h2>From X + upper segment</h2><div class="pills" id="plays"></div><p class="note" id="playNote"></p></section>
@@ -75,6 +76,22 @@ pre{margin:0;white-space:pre-wrap;font:12px/1.45 ui-monospace,monospace;color:va
 <button type="button" data-q="cpu">Sell CPUs?</button>
 <button type="button" data-q="metric">tok/s fake?</button>
 </div><p class="note" id="ans"></p></div></section>
+<section class="card" id="desk">
+<h2>Desk</h2>
+<p style="margin:0 0 8px">Pusula Infra. Serving operator. Istanbul / Kocaeli. The chip is not the bill.</p>
+<p class="note" style="margin:0 0 8px">Not a resume. The console above is the work.</p>
+<ul class="note" style="margin:0;padding-left:18px;line-height:1.6">
+<li>16 concurrent stands. 32 pages. Cut max-model-len first.</li>
+<li>Prefix hit 0% is theater.</li>
+<li>MoE looks cheap until 256K is open.</li>
+</ul>
+<div class="row">
+<a href="https://x.com/pusulainfra">X</a>
+<a href="https://github.com/PusulaInfra">GitHub</a>
+<a href="https://youtube.com/@pusulainfra">YouTube</a>
+<a href="/ops/">Ops</a>
+</div>
+</section>
 </main>
 <script>
 const MODELS=[{id:"qwen3-32b",name:"Qwen3 32B",hf:"Qwen/Qwen3-32B",params:32.5,layers:64,kvHeads:8,headDim:128,attn:"gqa",moe:false,active:32.5},{id:"qwen-2.5-72b",name:"Qwen2.5 72B",hf:"Qwen/Qwen2.5-72B-Instruct",params:72.7,layers:80,kvHeads:8,headDim:128,attn:"gqa",moe:false,active:72.7},{id:"llama-3.3-70b",name:"Llama 3.3 70B",hf:"meta-llama/Llama-3.3-70B-Instruct",params:70.6,layers:80,kvHeads:8,headDim:128,attn:"gqa",moe:false,active:70.6},{id:"mixtral-8x22b",name:"Mixtral 8x22B",hf:"mistralai/Mixtral-8x22B-Instruct-v0.1",params:141,layers:56,kvHeads:8,headDim:128,attn:"gqa",moe:true,active:39},{id:"deepseek-v3",name:"DeepSeek-V3",hf:"deepseek-ai/DeepSeek-V3",params:671,layers:61,kvHeads:1,headDim:128,attn:"mla",moe:true,active:37,latent:512,rope:64},{id:"qwen3-8b",name:"Qwen3 8B",hf:"Qwen/Qwen3-8B",params:8,layers:36,kvHeads:8,headDim:128,attn:"gqa",moe:false,active:8}];
