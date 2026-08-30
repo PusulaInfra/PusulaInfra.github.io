@@ -6,7 +6,7 @@
 <link rel="icon" href="icon.svg"/>
 <meta property="og:image" content="https://pusulainfra.github.io/banner.svg"/>
 <meta property="og:title" content="Pusula Serve"/>
-<meta name="description" content="LLM serving config copilot. The chip is not the bill."/>
+<meta name="description" content="LLM serving planner. Pick model + GPU + context. STANDS or PAGES before you buy another chip."/>
 <style>
 :root{--bg:#07080c;--ink:#e8edf6;--dim:#8a93a6;--line:#262b38;--card:#10131a;--cyan:#6ee0ff;--ok:#5ee9b5;--bad:#ff6b81;--warn:#f5c16c}
 *{box-sizing:border-box}html,body{margin:0;background:var(--bg);color:var(--ink);font-family:ui-sans-serif,system-ui,sans-serif}
@@ -38,10 +38,16 @@ pre{margin:0;white-space:pre-wrap;font:12px/1.45 ui-monospace,monospace;color:va
 header a[href="#desk"]{border-color:var(--cyan);color:var(--cyan)}
 </style></head><body>
 <div id="boot"><div class="mark"><img src="icon.svg" alt="Pusula"/></div><div class="brand">Pusula Serve</div><p>The chip is not the bill.</p></div>
-<header><div class="ident"><div class="mark"><img src="icon.svg" alt="Pusula"/></div><div><div class="brand">Pusula Serve</div><p class="sub">LLM serving config copilot. The chip is not the bill.</p></div></div><div class="row" style="margin:0"><a href="/ops/">Ops</a><button type="button" id="share">Share</button><a href="#desk">Desk</a><a href="https://x.com/pusulainfra">X</a><a href="https://youtube.com/@pusulainfra">YouTube</a><a href="https://github.com/PusulaInfra/pusula-serve">Repo</a></div></header>
+<header><div class="ident"><div class="mark"><img src="icon.svg" alt="Pusula"/></div><div><div class="brand">Pusula Serve</div><p class="sub">LLM serving planner. The chip is not the bill.</p></div></div><div class="row" style="margin:0"><a href="/ops/">Ops</a><button type="button" id="share">Share</button><a href="#desk">Desk</a><a href="https://x.com/pusulainfra">X</a><a href="https://youtube.com/@pusulainfra">YouTube</a><a href="https://github.com/PusulaInfra/pusula-serve">Repo</a></div></header>
 <div class="hero"><img src="banner.svg" alt="Pusula Serve"/></div>
 <main>
-<section class="card" style="margin-top:0"><h2>This week we try</h2><div class="pills" id="plays"></div><p class="note" id="playNote"></p></section>
+<section class="card" style="margin-top:0">
+<h2>What this is</h2>
+<p style="margin:0 0 8px">Planner for LLM serving. Not a resume. Not a train log.</p>
+<p class="note" style="margin:0 0 8px">Pick a model, a GPU, and a context length. The page estimates weights + KV cache. <b class="ok">STANDS</b> = fits in memory. <b class="bad">PAGES</b> = it will OOM or swap.</p>
+<p class="note" style="margin:0">Point: the chip is not the bill. Cut max-model-len and concurrent before you buy another card. Then copy the vLLM / SGLang / MLX command.</p>
+</section>
+<section class="card"><h2>This week we try</h2><div class="pills" id="plays"></div><p class="note" id="playNote"></p></section>
 <section class="grid2">
 <div class="card"><h2>Workload</h2>
 <label>Model</label><select id="model"></select>
