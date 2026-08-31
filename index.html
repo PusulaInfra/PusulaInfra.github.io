@@ -36,6 +36,10 @@ pre{margin:0;white-space:pre-wrap;font:12px/1.45 ui-monospace,monospace;color:va
 #boot .mark{width:64px;height:64px;border-radius:16px}
 #boot p{margin:0;color:var(--dim);font-size:13px}
 header a[href="#desk"]{border-color:var(--cyan);color:var(--cyan)}
+.topo{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-top:8px}
+.chip{border:1px solid var(--line);background:#0b0e14;border-radius:10px;padding:8px 10px;font:12px ui-monospace,monospace}
+.chip b{display:block;color:var(--cyan);font-size:11px;letter-spacing:.08em}
+.arrow{color:var(--dim)}
 </style></head><body>
 <div id="boot"><div class="mark"><img src="icon.svg" alt="Pusula"/></div><div class="brand">Pusula Serve</div><p>The chip is not the bill.</p></div>
 <header><div class="ident"><div class="mark"><img src="icon.svg" alt="Pusula"/></div><div><div class="brand">Pusula Serve</div><p class="sub">LLM serving planner. The chip is not the bill.</p></div></div><div class="row" style="margin:0"><a href="/ops/">Ops</a><button type="button" id="share">Share</button><a href="#desk">Desk</a><a href="https://x.com/pusulainfra">X</a><a href="https://youtube.com/@pusulainfra">YouTube</a><a href="https://github.com/PusulaInfra/pusula-serve">Repo</a></div></header>
@@ -45,7 +49,7 @@ header a[href="#desk"]{border-color:var(--cyan);color:var(--cyan)}
 <h2>What this is</h2>
 <p style="margin:0 0 8px">Planner for LLM serving. Not a resume. Not a train log.</p>
 <p class="note" style="margin:0 0 8px">Pick a model, a GPU, and a context length. The page estimates weights + KV cache. <b class="ok">STANDS</b> = fits in memory. <b class="bad">PAGES</b> = it will OOM or swap.</p>
-<p class="note" style="margin:0">Point: the chip is not the bill. Cut max-model-len and concurrent before you buy another card. Then copy the vLLM / SGLang / MLX command.</p>
+<p class="note" style="margin:0">Point: the chip is not the bill. Cut max-model-len and concurrent before you buy another card. Then copy the launch script.</p>
 </section>
 <section class="card"><h2>This week we try</h2><div class="pills" id="plays"></div><p class="note" id="playNote"></p></section>
 <section class="grid2">
@@ -56,7 +60,7 @@ header a[href="#desk"]{border-color:var(--cyan);color:var(--cyan)}
 <div class="grid2"><div><label>ISL prompt</label><input id="isl" type="number" value="2048"/></div><div><label>OSL decode</label><input id="osl" type="number" value="256"/></div></div>
 <div class="grid2"><div><label>LoRA adapters</label><input id="lora" type="number" value="0" min="0"/></div><div><label>Spec draft tokens</label><input id="spec" type="number" value="0" min="0" max="8"/></div></div>
 <label>Prefix hit <span id="hitv">0%</span></label><input id="hit" type="range" min="0" max="90" step="5" value="0"/>
-<label>Engine</label><select id="engine"><option value="vllm">vLLM</option><option value="sglang">SGLang</option><option value="mlx">MLX</option></select>
+<label>Engine</label><select id="engine"><option value="vllm">vLLM</option><option value="sglang">SGLang</option><option value="trt">TensorRT-LLM</option><option value="llama">llama.cpp</option><option value="mlx">MLX</option></select>
 </div>
 <div class="card"><h2>Box</h2>
 <label>Node</label><select id="gpu"></select>
@@ -68,6 +72,35 @@ header a[href="#desk"]{border-color:var(--cyan);color:var(--cyan)}
 <section class="card"><h2>Upper segment decision</h2>
 <div class="kpi"><div><label>Shape</label><b id="shape">—</b></div><div><label>P/D split?</label><b id="pd">—</b></div><div><label>LoRA tax</label><b id="ltax">—</b></div><div><label>Spec tax</label><b id="stax">—</b></div></div>
 <p class="note" id="pdNote"></p></section>
+<section class="card"><h2>Rent · month (edit the rate)</h2>
+<p class="note" style="margin:0 0 8px">Not a live ticker. Defaults are public on-demand ballpark as of Aug 2026. Type the quote you were given.</p>
+<div class="grid2">
+<div><label>Provider</label>
+<select id="cloud">
+<option value="runpod">RunPod on-demand</option>
+<option value="lambda">Lambda Labs</option>
+<option value="aws">AWS on-demand</option>
+<option value="own">Own box / power only</option>
+</select></div>
+<div><label>$ / GPU / hour</label><input id="rate" type="number" step="0.01" value="2.69"/></div>
+<div><label>Hours / month</label><input id="hrs" type="number" value="720"/></div>
+<div><label>API compare $ / M out</label><input id="apim" type="number" step="0.05" value="0.65"/></div>
+</div>
+<div class="kpi" style="margin-top:10px">
+<div><label>Box / month</label><b id="m-mo">—</b></div>
+<div><label>Est. $ / M out</label><b id="m-mil">—</b></div>
+</div>
+<p class="note" id="rentCut"></p>
+</section>
+<section class="card"><h2>Quant table</h2>
+<p class="note" style="margin:0 0 8px">Memory is estimated. Quality is a relative flag, not a measured perplexity.</p>
+<table><thead><tr><th>Weights</th><th>GB</th><th>vs BF16</th><th>Quality flag</th></tr></thead><tbody id="qboard"></tbody></table>
+</section>
+<section class="card"><h2>Cluster map · TP / PP</h2>
+<p class="note" style="margin:0">How this planner would split the selected GPU count. Under 4 GPUs a second pool is theater.</p>
+<div class="topo" id="topo"></div>
+<p class="note" id="topoNote"></p>
+</section>
 <section class="card"><h2>Lab board</h2>
 <table><thead><tr><th>Conc</th><th>KV GB</th><th>Per device</th><th>Verdict</th></tr></thead><tbody id="board"></tbody></table>
 <p class="note" id="labLine"></p></section>
@@ -75,7 +108,18 @@ header a[href="#desk"]{border-color:var(--cyan);color:var(--cyan)}
 <div class="row"><button type="button" id="add5090">+ 5090</button><button type="button" id="addSpark">+ Spark</button><button type="button" id="addStudio">+ Studio</button><button type="button" id="addMini">+ Mini</button><button type="button" id="addPro">+ Pro 6000</button></div>
 <div id="fleet"></div></section>
 <section class="grid2">
-<div class="card"><h2>Launch</h2><div class="row"><button type="button" id="copy">Copy</button><button type="button" id="tweet">Post on X</button></div><pre id="cmd"></pre></div>
+<div class="card"><h2>Launch scripts</h2>
+<div class="pills" id="engPills">
+<button type="button" data-e="vllm">vLLM</button>
+<button type="button" data-e="sglang">SGLang</button>
+<button type="button" data-e="trt">TRT-LLM</button>
+<button type="button" data-e="llama">llama.cpp</button>
+<button type="button" data-e="mlx">MLX</button>
+</div>
+<div class="row"><button type="button" id="copy">Copy</button><button type="button" id="tweet">Post on X</button></div>
+<pre id="cmd"></pre>
+<p class="note">No API key. No SSH agent. Copy the script to your own box.</p>
+</div>
 <div class="card"><h2>Ask</h2><div class="pills" id="asks">
 <button type="button" data-q="stand">Stand up?</button>
 <button type="button" data-q="pd">Buy P/D?</button>
@@ -114,10 +158,52 @@ function bestSeqs(){let lo=0,hi=4096,best=0;while(lo<=hi){const mid=(lo+hi)>>1;i
 function shape(){const isl=+$("isl").value,osl=+$("osl").value;if(isl>osl*4)return "prefill-heavy";if(osl>isl*2)return "decode-heavy";return "balanced"}
 function pdCall(a){const sh=shape();const big=a.spec.params>=70;const long=+$("isl").value>=4096;const hot=+$("seqs").value>=16;if(a.n<4)return {v:"no",n:"Under 4 GPUs the second pool is theater."};if((big||long)&&hot)return {v:"yes",n:"P/D: prefill on FLOPS, decode on HBM."};if(sh==="prefill-heavy")return {v:"maybe",n:"Long prompts stall decode if co-located."};return {v:"no",n:"Co-locate. Disagg doubles GPU count."}}
 function analyze(){const a=runAt(+$("seqs").value);a.best=bestSeqs();a.sh=shape();a.pd=pdCall(a);if(a.node.role==="agent")a.cut="Agent host. No 70B weights.";else if(a.node.id==="SPARK"&&a.ctx>=1000000)a.cut="1M on Spark + high util is the leak. Cap at 256K, util 0.78.";else if(a.node.id==="SPARK"&&a.ctx>=262144)a.cut="Spark 256K stands at util 0.78. 1M + 0.80 is the next leak.";else if(a.oom&&a.best>=1)a.cut="Cut concurrent to "+a.best+".";else if(a.oom)a.cut="Will not stand. Q4 or cap ctx.";else if(+$("hit").value===0&&a.kv>8)a.cut="Prefix 0%. Reuse is theater.";else if(a.kv>a.weight*0.5)a.cut="KV is the bill. Cap max-model-len.";else if(+$("lora").value>8)a.cut="Multi-LoRA on one base.";else if(a.pd.v==="yes")a.cut="Fits co-located. Next spend is a decode pool.";else a.cut="Fits. Diff flags before latest.";return a}
-function cmd(a){if(a.node.kind==="apple"||$("engine").value==="mlx")return "mlx_lm.server --model "+a.spec.hf;var s="vllm serve "+a.spec.hf+" --max-model-len "+a.ctx+" --tensor-parallel-size "+a.tp+" --gpu-memory-utilization "+a.node.util.toFixed(2)+" --max-num-seqs "+a.seqs+" --enable-prefix-caching";if(a.node.id==="SPARK")s+=" --kv-cache-dtype fp8 --block-size 256 --max-num-batched-tokens 8192";return s}
+function cmd(a){
+  const e=$("engine").value, m=a.spec.hf, tp=a.tp, ctx=a.ctx, u=a.node.util.toFixed(2), n=a.seqs;
+  if(e==="mlx"||a.node.kind==="apple")return "# MLX \u00b7 Apple unified\nmlx_lm.server --model "+m+" --max-tokens "+ctx;
+  if(e==="sglang")return "# SGLang\npython -m sglang.launch_server --model-path "+m+" --tp "+tp+" --context-length "+ctx+" --mem-fraction-static "+u+" --enable-prefix-caching";
+  if(e==="trt")return "# TensorRT-LLM \u00b7 build then serve\ntrtllm-serve "+m+" --tp_size "+tp+" --max_seq_len "+ctx+" --max_num_tokens "+Math.max(2048,ctx);
+  if(e==="llama")return "# llama.cpp\n./llama-server -m WEIGHTS.gguf -c "+ctx+" -ngl 99 -np "+n+" --host 0.0.0.0 --port 8080";
+  var s="vllm serve "+m+" --max-model-len "+ctx+" --tensor-parallel-size "+tp+" --gpu-memory-utilization "+u+" --max-num-seqs "+n+" --enable-prefix-caching";
+  if(a.node.id==="SPARK")s+=" --kv-cache-dtype fp8 --block-size 256 --max-num-batched-tokens 8192";
+  return "# vLLM\n"+s;
+}
+const RATES={H100:{runpod:2.69,lambda:3.29,aws:6.88,own:0.35},H200:{runpod:3.59,lambda:4.49,aws:7.91,own:0.45},RTX5090:{runpod:0.69,lambda:0.80,aws:2.20,own:0.12},PRO6000:{runpod:1.64,lambda:1.89,aws:3.36,own:0.18},SPARK:{runpod:1.10,lambda:1.10,aws:1.10,own:0.08},STUDIO:{runpod:0,lambda:0,aws:0,own:0.06},MINI:{runpod:0,lambda:0,aws:0,own:0.03}};
+function syncRate(){const n=$("gpu").value,c=$("cloud").value;const row=RATES[n]||RATES.H100;$("rate").value=row[c]!=null?row[c]:2.5}
+function rent(a){
+  const rate=Math.max(0,+$("rate").value), hrs=Math.max(1,+$("hrs").value), api=Math.max(0.01,+$("apim").value);
+  const mo=rate*a.n*hrs;
+  const tps=a.node.kind==="apple"?80:(a.node.id==="SPARK"?400:1600);
+  const mil=(rate/(tps*3600*0.4))*1e6;
+  if($("m-mo"))$("m-mo").textContent="$"+mo.toFixed(0);
+  if($("m-mil"))$("m-mil").textContent="$"+mil.toFixed(2);
+  if($("rentCut"))$("rentCut").textContent=mil<api
+    ?("Box cheaper than $"+api.toFixed(2)+"/M at ~40% duty. Still a planner, not a live ticker.")
+    :("API cheaper until duty or tok/s rises. Edit the $/hr you were quoted.");
+}
+function qboard(a){
+  if(!$("qboard"))return;
+  const rows=[{k:"BF16",b:2,q:"reference"},{k:"FP8",b:1,q:"close"},{k:"INT8",b:1,q:"close"},{k:"Q4 / AWQ / GPTQ",b:0.5,q:"expect drift"}];
+  $("qboard").innerHTML=rows.map(function(r){
+    const gb=a.spec.params*r.b;
+    const save=(((2-r.b)/2)*100).toFixed(0);
+    return "<tr><td>"+r.k+"</td><td>"+gb.toFixed(1)+"</td><td>"+save+"%</td><td>"+r.q+"</td></tr>";
+  }).join("");
+}
+function topo(a){
+  if(!$("topo"))return;
+  const bits=[];
+  bits.push('<div class="chip"><b>GPUS</b>'+a.n+'</div><span class="arrow">→</span>');
+  bits.push('<div class="chip"><b>TP</b>'+a.tp+'</div><span class="arrow">×</span>');
+  bits.push('<div class="chip"><b>PP</b>'+a.pp+'</div>');
+  $("topo").innerHTML=bits.join("");
+  if($("topoNote"))$("topoNote").textContent=a.n<4
+    ?"Under 4 GPUs keep one replica. A second pool doubles the bill."
+    :("TP="+a.tp+" shards weights. PP="+a.pp+" stacks layers. Prefill vs decode split is the next spend, not more TP.");
+}
 function paint(){$("hitv").textContent=$("hit").value+"%";const a=analyze();const wp=a.weight/(a.tp*a.pp),kp=a.kv/a.tp,sum=Math.max(a.usable,wp+kp+a.rt);$("stack").innerHTML='<i class="w" style="width:'+(100*wp/sum)+'%"></i><i class="k" style="width:'+(100*kp/sum)+'%"></i><i class="r" style="width:'+(100*a.rt/sum)+'%"></i><i class="h" style="width:'+Math.max(0,100*(a.usable-wp-kp-a.rt)/sum)+'%"></i>';$("m-w").textContent=a.weight.toFixed(1)+" GB";$("m-k").textContent=a.kv.toFixed(1)+" GB";$("m-p").textContent=a.per.toFixed(1)+" GB";$("m-s").textContent=String(a.best);$("health").className=a.oom?"bad":"ok";$("health").textContent=a.oom?("WILL NOT STAND · "+a.per.toFixed(1)+" > "+a.usable.toFixed(1)):("HEADROOM "+(a.usable-a.per).toFixed(1)+" GB");$("cut").textContent=a.cut;$("nodeNote").textContent=a.node.name+" · "+a.node.kind+" · "+a.node.bw+" GB/s HBM/UMA";$("cmd").textContent=cmd(a);$("shape").textContent=a.sh;$("pd").textContent=a.pd.v;$("ltax").textContent=loraGB(a.spec,+$("lora").value).toFixed(1)+" GB";$("stax").textContent=specGB(a.spec,+$("spec").value).toFixed(1)+" GB";$("pdNote").textContent=a.pd.n;$("board").innerHTML=[4,8,16,24,32,48].map(function(c){const x=runAt(c);const ratio=x.per/x.usable;let v="STANDS",cls="ok";if(x.oom){v="PAGES";cls="bad";}else if(ratio>0.92){v="TIGHT";cls="bad";}return "<tr><td>"+c+"</td><td>"+x.kv.toFixed(1)+"</td><td>"+x.per.toFixed(1)+"</td><td class='"+cls+"'>"+v+"</td></tr>"}).join("");
 var a16=runAt(16),a32=runAt(32);if($("labLine"))$("labLine").textContent=(a16.oom?"16 pages. ":"16 stands. ")+(a32.oom?"32 pages.":"32 stands.");
-renderFleet()}
+rent(a);qboard(a);topo(a);renderFleet()}
 function nodeFit(node){const spec=MODELS.find(function(m){return m.id===$("model").value});const weight=spec.params*+$("wbit").value+loraGB(spec,+$("lora").value);const kv=(kvB(spec,+$("kbit").value)*+$("ctx").value*+$("seqs").value*(1-+$("hit").value/100*0.75))/(1024**3);return{infer:node.role!=="agent"&&(weight+kv+2)<=node.vram*node.util}}
 function renderFleet(){if(!fleet.length){$("fleet").innerHTML="<p class='note'>Empty.</p>";return}$("fleet").innerHTML=fleet.map(function(id,i){const n=NODES.find(function(x){return x.id===id});const tag=nodeFit(n).infer?"INFER":(n.role==="agent"?"AGENT":"SMALL");return "<div class='node'><div><b>"+n.name+"</b> "+tag+"</div><button type='button' data-i='"+i+"'>remove</button></div>"}).join("")}
 function answer(q){const a=analyze();const map={stand:a.oom?("No. Fit ≈ "+a.best):"Yes. Publish 16/32.",pd:a.pd.n,lora:(+$("lora").value?($("lora").value+" adapters on one base."):"Zero adapters."),cpu:"Hold the CPUs.",metric:"tok/s with prefix hits is cache, not work."};$("ans").textContent=map[q]}
@@ -137,6 +223,13 @@ $("share").onclick=shareCard;
 function add(id){fleet.push(id);paint()}
 $("add5090").onclick=function(){add("RTX5090")};$("addSpark").onclick=function(){add("SPARK")};$("addStudio").onclick=function(){add("STUDIO")};$("addMini").onclick=function(){add("MINI")};$("addPro").onclick=function(){add("PRO6000")};
 $("fleet").addEventListener("click",function(e){const b=e.target.closest("button");if(!b||b.dataset.i==null)return;fleet.splice(+b.dataset.i,1);paint()});
+$("cloud").addEventListener("change",function(){syncRate();paint()});
+$("rate").addEventListener("input",paint);
+$("hrs").addEventListener("input",paint);
+$("apim").addEventListener("input",paint);
+$("engPills").addEventListener("click",function(e){const b=e.target.closest("button");if(!b)return;$("engine").value=b.dataset.e;paint()});
+$("gpu").addEventListener("change",function(){syncRate();});
+syncRate();
 paint();
 setTimeout(function(){$("boot").className="hide"},900);
 </script></body></html>
