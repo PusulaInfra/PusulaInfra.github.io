@@ -10,4 +10,6 @@
 
 </div>
 
-Product repos: [pusula-serve](https://github.com/PusulaInfra/pusula-serve) · [pusula-bill](https://github.com/PusulaInfra/pusula-bill)
+Not a VRAM toy. A serving plan.
+
+Product repo: [pusula-serve](https://github.com/PusulaInfra/pusula-serve)
