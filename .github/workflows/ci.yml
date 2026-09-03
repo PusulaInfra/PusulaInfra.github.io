@@ -1,4 +1,4 @@
-name: Pusula-Serve CI
+name: Pusula Pages CI
 
 on:
   push:
@@ -7,25 +7,27 @@ on:
     branches: [ "main" ]
 
 jobs:
-  build-and-test:
+  check-html:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Set up Go
-        uses: actions/setup-go@v5
-        with:
-          go-version: '1.22'
+      - name: Console files exist
+        run: |
+          test -f index.html
+          test -f ops/index.html
+          test -f about/index.html
+          test -f pusula-serve/index.html
+          test -f legal/index.html
+          grep -q 'function pack(' index.html
+          grep -q 'function paint(' ops/index.html
+          grep -q 'vram:32' index.html
+          grep -q 'id="boot"' index.html
 
-      - name: Install dependencies
-        run: go mod download
-
-      - name: Run Tests with Race Detector
-        run: go test -v -race ./...
-
-      - name: Run Engine Benchmarks
-        run: go test -bench=. -benchmem ./engine
-
-      - name: Build Project
-        run: go build -v -o bin/pusula-serve cmd/main.go
+      # Original Go job kept as comments — this repo has no Go module:
+      # - uses: actions/setup-go@v5
+      #   with:
+      #     go-version: '1.22'
+      # - run: go test -v -race ./...
+      # - run: go build -v -o bin/pusula-serve cmd/main.go
