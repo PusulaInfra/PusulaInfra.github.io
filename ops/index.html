@@ -3,7 +3,7 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
 <meta name="theme-color" content="#07080c"/>
-<link rel="icon" href="/icon.svg"/>
+<link rel="icon" href="../icon.svg"/>
 <title>Pusula Ops</title>
 <style>
 :root{--bg:#07080c;--ink:#e8edf6;--dim:#8a93a6;--line:#262b38;--card:#10131a;--cyan:#6ee0ff;--ok:#5ee9b5;--bad:#ff6b81}
@@ -15,15 +15,15 @@ header{padding:16px;border-bottom:1px solid var(--line)}
 .brand{font:700 13px ui-monospace,monospace;letter-spacing:.12em;color:var(--cyan);text-transform:uppercase}
 .sub,.note{color:var(--dim);font-size:13px;line-height:1.5;margin:6px 0 0}
 .nav{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0 0}
-.nav a{color:var(--ink);text-decoration:none;border:1px solid var(--line);background:#141821;border-radius:8px;padding:7px 10px;font-size:12px}
+.nav a{min-height:44px;display:inline-flex;align-items:center;color:var(--ink);text-decoration:none;border:1px solid var(--line);background:#141821;border-radius:8px;padding:7px 10px;font-size:12px}
 .nav a.on{border-color:var(--cyan);color:var(--cyan)}
 .hero{line-height:0;border-bottom:1px solid var(--line)}
 .hero img{width:100%;display:block;max-height:110px;object-fit:cover}
 main{max-width:860px;margin:0 auto;padding:14px 16px 40px}
 .tabs{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
-.tabs button{border:1px solid var(--line);background:#141821;color:var(--ink);border-radius:999px;padding:8px 12px}
+.tabs button{min-height:44px;border:1px solid var(--line);background:#141821;color:var(--ink);border-radius:999px;padding:8px 12px}
 .tabs button.on{border-color:var(--cyan);color:var(--cyan)}
-.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px;margin-top:12px}
+.card{background:rgba(16,19,26,.92);backdrop-filter:blur(12px);background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px;margin-top:12px}
 label{display:block;font-size:11px;color:var(--dim);letter-spacing:.08em;text-transform:uppercase;margin:8px 0 4px}
 select,input{width:100%;background:#0b0e14;color:var(--ink);border:1px solid var(--line);border-radius:10px;padding:10px;font-size:16px}
 .g{display:grid;grid-template-columns:1fr 1fr;gap:8px}
@@ -31,10 +31,10 @@ select,input{width:100%;background:#0b0e14;color:var(--ink);border:1px solid var
 .ok{color:var(--ok)}.bad{color:var(--bad)}.hide{display:none}
 table{width:100%;border-collapse:collapse;font-size:13px;margin-top:8px}th,td{border-bottom:1px solid var(--line);padding:7px 4px;text-align:left}th{color:var(--dim);font-size:11px}
 </style></head><body>
-<div class="hero"><img src="/banner.svg" alt="Pusula Serve"/></div>
+<div class="hero"><img src="../banner.svg" alt="Pusula Serve"/></div>
 <header>
-<div class="ident"><div class="mark"><img src="/icon.svg" alt="Pusula"/></div><div><div class="brand">Pusula Ops</div><p class="sub">Serve = will it stand. Ops = does the box beat the API, p99, is a human waiting.</p></div></div>
-<div class="nav"><a href="/">Serve</a><a class="on" href="/ops/">Ops</a><a href="https://x.com/pusulainfra">X</a><a href="https://github.com/PusulaInfra/pusula-serve">Repo</a></div>
+<div class="ident"><div class="mark"><img src="../icon.svg" alt="Pusula"/></div><div><div class="brand">Pusula Ops</div><p class="sub">Serve = will it stand. Ops = does the box beat the API, p99, is a human waiting.</p></div></div>
+<div class="nav"><a href="../">Serve</a><a class="on" href="./">Ops</a><a href="https://x.com/pusulainfra">X</a><a href="https://github.com/PusulaInfra/pusula-serve">Repo</a></div>
 <div class="tabs">
 <button type="button" class="on" data-t="bill">Bill</button>
 <button type="button" data-t="slo">SLO</button>
@@ -43,6 +43,7 @@ table{width:100%;border-collapse:collapse;font-size:13px;margin-top:8px}th,td{bo
 </div>
 </header>
 <main>
+<p class="note" id="echo"></p>
 <section id="p-bill">
 <div class="card">
 <label>Box $/hr</label>
@@ -64,10 +65,10 @@ table{width:100%;border-collapse:collapse;font-size:13px;margin-top:8px}th,td{bo
 </div>
 <div class="card">
 <div class="kpi">
-<div><label>Box / month</label><b id="m-box">—</b></div>
-<div><label>Effective $/M</label><b id="m-unit">—</b></div>
-<div><label>vs API</label><b id="m-vs">—</b></div>
-<div><label>Crossover util</label><b id="m-x">—</b></div>
+<div><label>Box / month</label><b id="m-box">$7200</b></div>
+<div><label>Effective $/M</label><b id="m-unit">$1.09</b></div>
+<div><label>vs API</label><b id="m-vs" class="bad">API</b></div>
+<div><label>Crossover util</label><b id="m-x">67%</b></div>
 </div>
 <p class="note" id="billCut"></p>
 <table><thead><tr><th>Util</th><th>$/M box</th><th>Winner</th></tr></thead><tbody id="board"></tbody></table>
@@ -88,10 +89,10 @@ table{width:100%;border-collapse:collapse;font-size:13px;margin-top:8px}th,td{bo
 </div>
 <div class="card">
 <div class="kpi">
-<div><label>Budget left min</label><b id="left">—</b></div>
-<div><label>Avail now</label><b id="av">—</b></div>
-<div><label>E2E ms</label><b id="e2e">—</b></div>
-<div><label>TTFT</label><b id="tf">—</b></div>
+<div><label>Budget left min</label><b id="left" class="bad">-36.8</b></div>
+<div><label>Avail now</label><b id="av">99.815%</b></div>
+<div><label>E2E ms</label><b id="e2e">8775</b></div>
+<div><label>TTFT</label><b id="tf" class="bad">OVER</b></div>
 </div>
 <p class="note" id="sloCut"></p>
 </div>
@@ -137,6 +138,7 @@ table{width:100%;border-collapse:collapse;font-size:13px;margin-top:8px}th,td{bo
 <p class="note" id="payCut"></p>
 </div>
 </section>
+<p class="note">Estimates only. <a href="../legal/" style="color:var(--cyan)">Disclaimer</a> · <a href="../privacy/" style="color:var(--cyan)">Privacy</a> · <a href="../terms/" style="color:var(--cyan)">Terms</a>.</p>
 </main>
 <script>
 const $=function(id){return document.getElementById(id)};
@@ -199,5 +201,16 @@ document.querySelectorAll(".tabs button").forEach(function(b){
   };
 });
 ["box","n","hrs","tps","util","api","slo","min","down","ttft","ttftb","itl","osl","badp","kind","host","many","wait","aff"].forEach(function(id){$(id).addEventListener("input",paint)});
-paint();
+(function fromServe(){
+  var q=new URLSearchParams(location.search);
+  if(q.get("gpus")) $("n").value=q.get("gpus");
+  var gpu=(q.get("gpu")||"").toUpperCase();
+  var map={H100:"2.5",H200:"3.44",A100:"2.5",RTX5090:"0.7",SPARK:"1.1",B200:"3.2"};
+  if(map[gpu]) $("box").value=map[gpu];
+  var bits=[q.get("model"), gpu && (($("n").value)+"×"+gpu), q.get("ctx") && ((+q.get("ctx")/1024)+"K"), q.get("seqs") && (q.get("seqs")+" seq")].filter(Boolean);
+  if(bits.length && $("echo")) $("echo").textContent="From Serve: "+bits.join(" · ");
+})();
+function safePaint(){ try{ paint(); }catch(e){ if($("billCut")) $("billCut").textContent="calc failed · "+e.message; } }
+safePaint();
+document.addEventListener("DOMContentLoaded", safePaint);
 </script></body></html>
