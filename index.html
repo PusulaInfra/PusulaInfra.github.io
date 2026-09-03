@@ -54,14 +54,27 @@ pre{margin:0;white-space:pre-wrap;font:12px/1.45 ui-monospace,monospace;color:va
 #boot .mark{width:64px;height:64px;border-radius:16px}
 #fail{display:none;color:var(--bad);border:1px solid var(--bad);border-radius:10px;padding:10px;margin-top:10px}
 @media(prefers-reduced-motion:reduce){#boot{transition:none}}
+
+.glass{background:rgba(16,19,26,.92);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);box-shadow:0 12px 40px rgba(0,0,0,.28)}
+.led{display:inline-flex;align-items:center;gap:8px;border-radius:999px;padding:6px 10px;font:600 11px/1 ui-monospace,monospace;letter-spacing:.08em;text-transform:uppercase}
+.led.ok{color:var(--ok);background:rgba(94,233,181,.14);border:1px solid rgba(94,233,181,.28)}
+.led.bad{color:var(--bad);background:rgba(255,107,129,.14);border:1px solid rgba(255,107,129,.28)}
+.led .dot{position:relative;width:8px;height:8px;border-radius:99px;background:currentColor}
+.led .dot:after{content:"";position:absolute;inset:0;border-radius:99px;background:currentColor;animation:led 1.6s cubic-bezier(0,0,.2,1) infinite}
+@keyframes led{75%,100%{transform:scale(2.1);opacity:0}}
+header a,header button,.row a,.row button,.pills button{min-height:44px;display:inline-flex;align-items:center;justify-content:center}
+.est{font-size:11px;color:var(--dim);letter-spacing:.04em;text-transform:uppercase}
+footer.legal{margin-top:14px;color:var(--dim);font-size:13px;line-height:1.5}
+@media(prefers-reduced-motion:reduce){.led .dot:after{animation:none}#boot{transition:none}}
 </style></head>
 <body>
-<header>
+<div id="boot"><div class="mark"><img src="icon.svg" alt=""/></div><div class="brand">Pusula Serve</div></div>
+<header class="glass">
   <div class="ident"><div class="mark"><img src="icon.svg" alt=""/></div>
-    <div><div class="brand">Pusula Serve</div><p class="sub">Not a VRAM toy. A serving plan. The chip is not the bill.</p></div>
+    <div><div class="brand" style="display:flex;flex-wrap:wrap;gap:8px;align-items:center">Pusula Serve <span id="led" class="led ok"><span class="dot"></span><span id="ledt">16 STANDS · 32 PAGES</span></span></div><p class="sub">Not a VRAM toy. A serving plan. The chip is not the bill.</p></div>
   </div>
   <div class="row" style="margin:0">
-    <a href="/">Serve</a><a href="/ops/">Ops</a>
+    <a href="./">Serve</a><a id="opsTop" href="ops/">Ops</a>
     <button type="button" id="share">Share</button>
     <a href="#desk">Desk</a>
     <a href="https://x.com/pusulainfra">X</a>
@@ -71,16 +84,17 @@ pre{margin:0;white-space:pre-wrap;font:12px/1.45 ui-monospace,monospace;color:va
 <div class="hero"><img src="banner.svg" alt="Pusula Serve"/></div>
 <main>
 <div id="fail">calc failed · reset to 70B · 4×H100 · 16K · 16</div>
-<section class="card" style="margin-top:0">
+<section class="card glass" style="margin-top:0">
 <h2>What this is</h2>
 <p style="margin:0">Pick a model, a box, a context, a concurrent. The page estimates weights + KV. <b class="ok">STANDS</b> fits. <b class="bad">PAGES</b> OOMs. Cut flags before the next card.</p>
+<p class="note">Planning estimates for engineering review. Not a quote, SLA, or capacity guarantee. Default preset: Llama 3.3 70B · 4×H100 · 16K · 16 · util 0.90 · BF16. <a href="legal/" style="color:var(--cyan)">Full disclaimer</a>.</p>
 </section>
-<section class="card"><h2>This week we try</h2>
+<section class="card glass"><h2>This week we try</h2>
 <div class="pills" id="plays"></div>
 <p class="note" id="playNote">Presets write the controls. Then the board fills.</p>
 </section>
 <section class="grid2">
-<div class="card"><h2>Workload</h2>
+<div class="card glass"><h2>Workload</h2>
 <label>Model</label><select id="model"></select>
 <div class="grid2">
   <div><label>Weights dtype</label><select id="wbit"><option value="2">BF16</option><option value="1">FP8</option></select></div>
@@ -112,7 +126,7 @@ pre{margin:0;white-space:pre-wrap;font:12px/1.45 ui-monospace,monospace;color:va
 <label>Prefix hit <span id="hitv">0%</span></label>
 <input id="hit" type="range" min="0" max="90" step="5" value="0"/>
 </div>
-<div class="card"><h2>Box</h2>
+<div class="card glass"><h2>Box</h2>
 <label>Node</label><select id="gpu"></select>
 <div class="grid2">
   <div><label>Count</label><select id="gpus"><option>1</option><option>2</option><option selected>4</option><option>8</option></select></div>
@@ -133,7 +147,7 @@ pre{margin:0;white-space:pre-wrap;font:12px/1.45 ui-monospace,monospace;color:va
 <p class="note" id="attnNote"></p>
 </div>
 </section>
-<section class="card"><h2>Upper segment</h2>
+<section class="card glass"><h2>Upper segment</h2>
 <div class="kpi">
   <div><label>Shape</label><b id="shape">infer</b></div>
   <div><label>P/D split?</label><b id="pd">no</b></div>
@@ -142,7 +156,7 @@ pre{margin:0;white-space:pre-wrap;font:12px/1.45 ui-monospace,monospace;color:va
 </div>
 <p class="note" id="pdNote"></p>
 </section>
-<section class="card"><h2>Rent · month</h2>
+<section class="card glass"><h2>Rent · month</h2>
 <p class="note" style="margin:0 0 8px">Not a live ticker. Aug 2026 on-demand ballpark. Overwrite the quote.</p>
 <div class="grid2">
   <div><label>Provider</label>
@@ -159,28 +173,28 @@ pre{margin:0;white-space:pre-wrap;font:12px/1.45 ui-monospace,monospace;color:va
 </div>
 <div class="kpi" style="margin-top:10px">
   <div><label>Box / month</label><b id="m-mo">$0</b></div>
-  <div><label>Est. $ / M</label><b id="m-mil">$0</b></div>
+  <div><label>Est. $ / M</label><b id="m-mil">$0</b><div class="est">estimate / not measured</div></div>
 </div>
 <p class="note" id="rentCut"></p>
 </section>
-<section class="card"><h2>Quant table</h2>
+<section class="card glass"><h2>Quant table</h2>
 <p class="note" style="margin:0 0 8px">Estimated memory. Quality is a flag. Not measured perplexity.</p>
 <div class="wrap"><table><thead><tr><th>Weights</th><th>GB</th><th>vs BF16</th><th>Flag</th></tr></thead><tbody id="qboard"></tbody></table></div>
 </section>
-<section class="card"><h2>Cluster map · TP / PP</h2>
+<section class="card glass"><h2>Cluster map · TP / PP</h2>
 <div class="topo" id="topo"></div>
 <p class="note" id="topoNote"></p>
 </section>
-<section class="card"><h2>Lab board</h2>
+<section class="card glass"><h2>Lab board</h2>
 <div class="wrap"><table><thead><tr><th>Conc</th><th>KV GB</th><th>Per device</th><th>Verdict</th></tr></thead><tbody id="board"></tbody></table></div>
 <p class="note" id="labLine"></p>
 </section>
-<section class="card"><h2>Fleet</h2>
+<section class="card glass"><h2>Fleet</h2>
 <p class="note" style="margin:0 0 8px">Same model + ctx + seqs. One card each. UMA is not an 80 GB H100.</p>
 <div id="fleet"></div>
 </section>
 <section class="grid2">
-<div class="card"><h2>Launch scripts</h2>
+<div class="card glass"><h2>Launch scripts</h2>
 <div class="pills" id="engPills">
   <button type="button" data-e="vllm" class="on">vLLM</button>
   <button type="button" data-e="sglang">SGLang</button>
@@ -192,7 +206,7 @@ pre{margin:0;white-space:pre-wrap;font:12px/1.45 ui-monospace,monospace;color:va
 <pre id="cmd"></pre>
 <p class="note" id="engNote">No API key. No SSH agent. Copy onto your own box.</p>
 </div>
-<div class="card"><h2>Ask</h2>
+<div class="card glass"><h2>Ask</h2>
 <div class="pills" id="asks">
   <button type="button" data-q="stand">Stand up?</button>
   <button type="button" data-q="pd">Buy P/D?</button>
@@ -203,7 +217,7 @@ pre{margin:0;white-space:pre-wrap;font:12px/1.45 ui-monospace,monospace;color:va
 <p class="note" id="ans">This page does not promise tok/s. If an estimate appears, it is marked.</p>
 </div>
 </section>
-<section class="card"><h2>Formula</h2>
+<section class="card glass"><h2>Formula</h2>
 <pre>weight = params_b * dtype_bytes
 kv/tok = GQA: 2*L*kv_h*d*kv_b
        | MLA: L*(latent+rope)*kv_b
@@ -211,9 +225,14 @@ kv     = kv/tok * ctx * seqs * (1 - hit*0.85)
 runtime = max(2, weight*0.08)
 total  = weight + kv + runtime + lora + spec
 usable = vram * util
-PAGES  = per_gpu > usable</pre>
+PAGES  = per_gpu > usable
+
+fixture  Llama 3.3 70B · 4×H100 · 16K · 16 · util 0.90 · BF16
+         JS pack → 16 STANDS
+         same · 32 seq → 32 PAGES
+Go Analyze (CLI/API) keeps runtime ≈ 2.2 GB and prefix 0.75.</pre>
 </section>
-<section class="card" id="desk">
+<section class="card glass" id="desk">
 <h2>Desk · week 1</h2>
 <p style="margin:0 0 8px">Pusula Infra. Serving operator. Istanbul / Kocaeli. We try the box. We do not fake a train log.</p>
 <p class="note" id="deskEcho">This pick: 16 … 32 …</p>
@@ -221,9 +240,19 @@ PAGES  = per_gpu > usable</pre>
   <a href="https://x.com/pusulainfra">X</a>
   <a href="https://github.com/PusulaInfra">GitHub</a>
   <a href="https://youtube.com/@pusulainfra">YouTube</a>
-  <a href="/ops/">Ops</a>
+  <a id="opsDesk" href="ops/">Ops</a>
 </div>
 </section>
+<footer class="legal">
+© 2026 PusulaInfra. MIT licensed. Estimates only — not a quote, SLA, or capacity guarantee.
+<div class="row">
+  <a href="legal/">Disclaimer</a>
+  <a href="privacy/">Privacy</a>
+  <a href="terms/">Terms</a>
+  <a href="https://youtube.com/@pusulainfra" rel="noreferrer me" target="_blank">YouTube</a>
+</div>
+<p class="note">Canonical console: https://pusulainfra.github.io/ · alias https://pusulainfra.github.io/pusula-serve/</p>
+</footer>
 </main>
 <script>
 const MODELS=[
@@ -254,7 +283,7 @@ const NODES=[
   {id:"STUDIO192",name:"Mac Studio 192 UMA",vram:192,kind:"apple",bw:800,util:0.55,role:"either"},
   {id:"STUDIO512",name:"Mac Studio 512 UMA",vram:512,kind:"apple",bw:800,util:0.50,role:"either"},
   {id:"MINI16",name:"Mac Mini 16 UMA",vram:16,kind:"apple",bw:153,util:0.50,role:"agent"},
-  {id:"MINI32",name:"Mac Mini 32 UMA",vram:24,kind:"apple",bw:200,util:0.50,role:"agent"},
+  {id:"MINI32",name:"Mac Mini 32 UMA",vram:32,kind:"apple",bw:200,util:0.50,role:"agent"},
   {id:"MINI64",name:"Mac Mini 64 UMA",vram:48,kind:"apple",bw:300,util:0.50,role:"either"}
 ];
 const RATES={
@@ -291,6 +320,9 @@ function loraTax(spec,n){ if(!n) return 0; return Math.min(8, n*(0.35+spec.param
 function specTax(spec,on){ return on? spec.params*0.10 : 0; }
 function pow2down(n){ let t=1; while(t*2<=n) t*=2; return t; }
 function pack(spec,node,n,ctx,seqs,wbit,kbit,util,hit,loraN,specOn){
+  n=Math.max(1,Math.floor(n)||1); ctx=Math.max(1,ctx||1); seqs=Math.max(1,seqs||1);
+  wbit=wbit>0?wbit:2; kbit=kbit>0?kbit:2;
+  util=Math.min(0.98,Math.max(0.3,util||node.util)); hit=Math.min(0.95,Math.max(0,hit||0));
   const weight=spec.params*wbit;
   const lora=loraTax(spec,loraN);
   const specg=specTax(spec,specOn);
@@ -310,7 +342,7 @@ function pack(spec,node,n,ctx,seqs,wbit,kbit,util,hit,loraN,specOn){
   return {spec:spec,node:node,n:n,ctx:ctx,seqs:seqs,weight:weight+lora+specg,kv:kv,kvB:kvB,runtime:runtime,per:pick.per,usable:usable,oom:pick.per>usable,tp:pick.tp,pp:pick.pp,lora:lora,specg:specg,hit:hit};
 }
 function read(){
-  const spec=MODELS.find(function(m){return m.id===$("model").value})||MODELS.find(function(m){return m.id==="llama-3.3-70b"});
+  var mid=$("model").value; if(mid==="llama-3.1-70b") mid="llama-3.3-70b"; const spec=MODELS.find(function(m){return m.id===mid})||MODELS.find(function(m){return m.id==="llama-3.3-70b"});
   const node=NODES.find(function(g){return g.id===$("gpu").value})||NODES[2];
   let hit=+$("hit").value/100;
   if($("work").value==="agent" && hit<0.4) hit=0.4;
@@ -378,6 +410,9 @@ function paint(){
       return "<tr><td>"+c+"</td><td>"+x.kv.toFixed(1)+"</td><td>"+x.per.toFixed(1)+"</td><td class='"+(x.oom?"bad":"ok")+"'>"+verdict(x.oom)+"</td></tr>";
     }).join("");
     $("labLine").textContent=(a16.oom?"16 pages. ":"16 stands. ")+(a32.oom?"32 pages.":"32 stands.");
+    var ledLab=(a16.oom?"16 PAGES":"16 STANDS")+" · "+(a32.oom?"32 PAGES":"32 STANDS");
+    $("ledt").textContent=ledLab;
+    $("led").className="led "+(a.oom?"bad":"ok");
     $("deskEcho").textContent="This pick: 16 "+verdict(a16.oom)+". 32 "+verdict(a32.oom)+".";
     $("fleet").innerHTML=FLEET.map(function(id){
       const n=NODES.find(function(x){return x.id===id});
@@ -393,7 +428,7 @@ function paint(){
     $("rentCut").textContent=mil<api?("Box cheaper than $"+api.toFixed(2)+"/M at ~40% duty. Not a live ticker."):("API cheaper until duty rises. Edit the $/hr you were quoted.");
     $("cmd").textContent=cmd(a);
     const uma=a.node.kind!=="cuda";
-    $("engNote").textContent=($("engine").value==="mlx"&&!uma)?"MLX disabled on CUDA. Pick UMA or another engine.":"No API key. No SSH agent. Copy onto your own box.";
+    $("engNote").textContent=(($("engine").value==="mlx"&&!uma)?"MLX disabled on CUDA. Pick UMA or another engine.":"No API key. No SSH agent. Copy onto your own box.")+" tok/s and $/M are estimates / not measured.";
     $("ans").textContent="Stand up? "+(a.oom?"No.":"Yes.")+"  P/D? "+pd+".  One replica per LoRA? No.  Sell CPUs? No.  tok/s? This page does not promise tok/s.";
   }catch(err){
     $("fail").style.display="block";
@@ -443,7 +478,11 @@ $("asks").addEventListener("click",function(e){
   };
   $("ans").textContent=map[b.dataset.q];
 });
-$("copy").onclick=function(){ navigator.clipboard.writeText($("cmd").textContent).then(function(){ $("copy").textContent="Copied"; setTimeout(function(){ $("copy").textContent="Copy"; },1200); }); };
+function copyText(t){
+  try{ if(navigator.clipboard&&navigator.clipboard.writeText){ navigator.clipboard.writeText(t); return true; } }catch(e){}
+  try{ var ta=document.createElement("textarea"); ta.value=t; ta.setAttribute("readonly",""); ta.style.position="fixed"; ta.style.left="-9999px"; document.body.appendChild(ta); ta.select(); var ok=document.execCommand("copy"); ta.remove(); return ok; }catch(e){ return false; }
+}
+$("copy").onclick=function(){ if(copyText($("cmd").textContent)){ $("copy").textContent="Copied"; setTimeout(function(){ $("copy").textContent="Copy"; },1200); } };
 $("tweet").onclick=function(){
   const a=read();
   const t=a.spec.name+" · "+a.node.name+" × "+a.n+" · "+verdict(a.oom)+"\n"+$("cut").textContent+"\nThe chip is not the bill.\nhttps://pusulainfra.github.io/";
@@ -451,8 +490,8 @@ $("tweet").onclick=function(){
 };
 $("share").onclick=function(){
   const t=$("cut").textContent+"\nhttps://pusulainfra.github.io/";
-  if(navigator.share) navigator.share({title:"Pusula Serve",text:t}).catch(function(){});
-  else navigator.clipboard.writeText(t);
+  if(navigator.share) navigator.share({title:"Pusula Serve",text:t}).catch(function(){ copyText(location.href); });
+  else copyText(location.href);
 };
 (function fromUrl(){
   const q=new URLSearchParams(location.search);
@@ -460,6 +499,7 @@ $("share").onclick=function(){
     if(q.has(k) && $(k)) $(k).value=q.get(k);
   });
   if(q.get("spec")==="1") $("spec").value="1";
+  if(q.get("model")==="llama-3.1-70b") $("model").value="llama-3.3-70b";
 })();
 function toUrl(){
   const q=new URLSearchParams();
@@ -469,9 +509,23 @@ function toUrl(){
   history.replaceState(null,"",location.pathname+"?"+q.toString());
 }
 const _paint=paint;
-paint=function(){ _paint(); try{ toUrl(); }catch(e){} };
+paint=function(){
+  _paint();
+  try{ toUrl(); }catch(e){}
+  try{
+    var qs=location.search||"";
+    var ops="ops/"+qs;
+    if($("opsTop")) $("opsTop").href=ops;
+    if($("opsDesk")) $("opsDesk").href=ops;
+  }catch(e){}
+};
 syncRate();
 paint();
+(function hideBoot(){
+  var b=$("boot"); if(!b) return;
+  b.classList.add("hide");
+  setTimeout(function(){ b.style.display="none"; }, 400);
+})();
 
 </script>
 </body></html>
