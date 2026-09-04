@@ -13,7 +13,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Console files exist
+      - name: One app, one planner
         run: |
           test -f index.html
           test -f ops/index.html
@@ -21,13 +21,12 @@ jobs:
           test -f pusula-serve/index.html
           test -f legal/index.html
           grep -q 'function pack(' index.html
-          grep -q 'function paint(' ops/index.html
           grep -q 'vram:32' index.html
           grep -q 'id="boot"' index.html
-
-      # Original Go job kept as comments — this repo has no Go module:
-      # - uses: actions/setup-go@v5
-      #   with:
-      #     go-version: '1.22'
-      # - run: go test -v -race ./...
-      # - run: go build -v -o bin/pusula-serve cmd/main.go
+          grep -q 'href="#plan"' index.html
+          grep -q 'location.replace' ops/index.html
+          grep -q 'location.replace' pusula-serve/index.html
+          grep -q 'location.replace' about/index.html
+          ! grep -q 'Pusula Serve' index.html
+          ! grep -q 'Pusula Ops' ops/index.html
+          ! grep -q 'href="ops/"' index.html
