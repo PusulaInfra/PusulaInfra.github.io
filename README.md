@@ -1,19 +1,17 @@
 <div align="center">
 
-<img src="banner.svg" alt="Pusula Serve" width="100%"/>
+<img src="banner.svg" alt="Pusula" width="100%"/>
 
 <img src="icon.svg" alt="icon" width="72"/>
 
-**The chip is not the bill.**
+**Pusula — this command boots on this box first try.**
 
-[Serve](https://pusulainfra.github.io/) · [Serve alias](https://pusulainfra.github.io/pusula-serve/) · [Ops](https://pusulainfra.github.io/ops/) · [X](https://x.com/pusulainfra)
+[App](https://pusulainfra.github.io/) · [X](https://x.com/pusulainfra)
 
 </div>
 
-Not a VRAM toy. A serving plan.
+One planner. Phone, desktop, and any link posted on X open `https://pusulainfra.github.io/`. Older paths (`/pusula-serve/`, `/ops/`) redirect there.
 
-This repo is the **canonical GitHub Pages console** (`https://pusulainfra.github.io/`). The same interactive console also lives at `https://pusulainfra.github.io/pusula-serve/` (project Pages from [pusula-serve](https://github.com/PusulaInfra/pusula-serve)). Both URLs run `pack()` / `paint()` in the browser.
-
-Product / Go CLI+API: [PusulaInfra/pusula-serve](https://github.com/PusulaInfra/pusula-serve)
+Source / CLI: [PusulaInfra/pusula-serve](https://github.com/PusulaInfra/pusula-serve)
 
 Estimates only — not a quote, SLA, or capacity guarantee. See [legal](https://pusulainfra.github.io/legal/).
