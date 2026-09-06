@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en"><head>
+<html lang="tr"><head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
 <meta name="theme-color" content="#07080c"/>
@@ -87,6 +87,7 @@ footer.legal{margin-top:14px;color:var(--dim);font-size:13px;line-height:1.5}
     <div><div class="brand" style="display:flex;flex-wrap:wrap;gap:8px;align-items:center">Pusula <span id="led" class="led ok"><span class="dot"></span><span id="ledt">16 STANDS · 32 PAGES</span></span></div><p class="sub">Not a VRAM toy. A serving plan. The chip is not the bill.</p></div>
   </div>
   <div class="row" style="margin:0">
+    <select id="lang" style="width:auto;min-height:44px"><option value="tr">TR</option><option value="en">EN</option></select>
     <a href="#plan">Plan</a><a href="#lab">Lab</a>
     <button type="button" id="share">Share</button>
     <a href="#lab">Lab</a>
@@ -101,6 +102,8 @@ footer.legal{margin-top:14px;color:var(--dim);font-size:13px;line-height:1.5}
 <h2>What this is</h2>
 <p style="margin:0">Pick a model, a box, a context, a concurrent. The page estimates weights + KV. <b class="ok">STANDS</b> fits. <b class="bad">PAGES</b> OOMs. Cut flags before the next card.</p>
 <p class="note">Planning estimates for engineering review. Not a quote, SLA, or capacity guarantee. Default preset: Llama 3.3 70B · 4×H100 · 16K · 16 · util 0.90 · BF16. <a href="legal/" style="color:var(--cyan)">Full disclaimer</a>.</p>
+<p class="note" style="font-family:ui-monospace,monospace" id="applied">w=bf16 kv=bf16 in=1024 out=256 nodes=1 xconn=nvlink lang=tr</p>
+<p class="note" id="utilErr" hidden style="color:var(--bad)"></p>
 </section>
 <section class="card glass"><h2>This week we try</h2>
 <div class="pills" id="plays"></div>
@@ -110,8 +113,17 @@ footer.legal{margin-top:14px;color:var(--dim);font-size:13px;line-height:1.5}
 <div class="card glass"><h2>Workload</h2>
 <label>Model</label><select id="model"></select>
 <div class="grid2">
-  <div><label>Weights dtype</label><select id="wbit"><option value="2">BF16</option><option value="1">FP8</option></select></div>
-  <div><label>KV dtype</label><select id="kbit"><option value="2">BF16 / FP16</option><option value="1">FP8</option></select></div>
+  <div><label>weights · w</label><select id="w">
+    <option value="bf16" selected>BF16 · 2 B/param</option>
+    <option value="fp8">FP8 · 1 B/param</option>
+    <option value="int8">INT8 · 1 B/param</option>
+    <option value="awq4">AWQ-4 · 0.5 B/param</option>
+    <option value="gptq4">GPTQ-4 · 0.5 B/param</option>
+  </select></div>
+  <div><label>KV · kv</label><select id="kv">
+    <option value="bf16" selected>BF16 / FP16</option>
+    <option value="fp8">FP8</option>
+  </select></div>
 </div>
 <div class="grid2">
   <div><label>max-model-len</label><select id="ctx">
@@ -121,8 +133,12 @@ footer.legal{margin-top:14px;color:var(--dim);font-size:13px;line-height:1.5}
     <option value="262144">256K</option>
   </select></div>
   <div><label>max-num-seqs</label><select id="seqs">
-    <option>1</option><option>4</option><option>8</option><option selected>16</option><option>32</option>
+    <option>1</option><option>4</option><option>8</option><option selected>16</option><option>32</option><option>64</option><option>128</option><option>256</option>
   </select></div>
+</div>
+<div class="grid2">
+  <div><label>prompt · in</label><input id="in" type="number" min="1" value="1024"/></div>
+  <div><label>generation · out</label><input id="out" type="number" min="1" value="256"/></div>
 </div>
 <div class="grid2">
   <div><label>Workload</label><select id="work"><option value="infer">infer</option><option value="agent">agent</option></select></div>
@@ -142,18 +158,31 @@ footer.legal{margin-top:14px;color:var(--dim);font-size:13px;line-height:1.5}
 <div class="card glass"><h2>Box</h2>
 <label>Node</label><select id="gpu"></select>
 <div class="grid2">
-  <div><label>Count</label><select id="gpus"><option>1</option><option>2</option><option selected>4</option><option>8</option></select></div>
-  <div><label>util</label><input id="util" type="number" min="0.70" max="0.95" step="0.01" value="0.90"/></div>
+  <div><label>GPUs / node</label><select id="gpus"><option>1</option><option>2</option><option selected>4</option><option>8</option><option>16</option></select></div>
+  <div><label>util</label><input id="util" type="number" min="0.30" max="0.95" step="0.01" value="0.90"/></div>
 </div>
+<div class="grid2">
+  <div><label>replicas · nodes</label><select id="nodes"><option selected>1</option><option>2</option><option>4</option><option>8</option></select></div>
+  <div><label>interconnect · xconn</label><select id="xconn">
+    <option value="nvlink">NVLink</option>
+    <option value="ib">IB</option>
+    <option value="pcie">PCIe</option>
+  </select></div>
+</div>
+<p class="note">nodes = replica count, not the GPU catalog. VRAM pack uses GPUs / node.</p>
+<p class="note">wbit in the URL is bytes (BF16=2). Not 2-bit quant.</p>
 <p class="note" id="nodeNote">H100 80GB · cuda · 3350 GB/s · HF meta-llama/Llama-3.3-70B-Instruct</p>
 <div class="bar" id="stack"></div>
 <div class="kpi">
   <div><label>Weights</label><b id="m-w">141.2 GB</b></div>
-  <div><label>KV</label><b id="m-k">80.0 GB</b></div>
+  <div><label>KV worst (ctx)</label><b id="m-k">80.0 GB</b></div>
+  <div><label>KV work (in+out)</label><b id="m-kw">6.3 GB</b></div>
   <div><label>KV / token</label><b id="m-kb">320.0 KB</b></div>
   <div><label>Per GPU</label><b id="m-p">57.5 GB</b></div>
   <div><label>Usable</label><b id="m-u">72.0 GB</b></div>
   <div><label>TP × PP</label><b id="m-tp">4 × 1</b></div>
+  <div><label>TTFT / TPOT</label><b id="m-lat">—</b></div>
+  <div><label>executor</label><b id="m-ex">mp</b></div>
 </div>
 <p id="health" class="ok">STANDS · headroom 14.5 GB</p>
 <p class="note" id="cut">16 seq stands. 32 seq pages. Cut ctx before the next card.</p>
@@ -231,14 +260,19 @@ footer.legal{margin-top:14px;color:var(--dim);font-size:13px;line-height:1.5}
 </div>
 </section>
 <section class="card glass"><h2>Formula</h2>
-<pre>weight = params_b * dtype_bytes
-kv/tok = GQA: 2*L*kv_h*d*kv_b
-       | MLA: L*(latent+rope)*kv_b
-kv     = kv/tok * ctx * seqs * (1 - hit*0.75)
-runtime = 2.2 vLLM / 2.4 SGLang
-per_gpu = weight/(tp*pp) + kv/tp + runtime
-usable = vram * util
+<pre>weight = params_b * weight_bytes     BF16=2  FP8=1  AWQ-4=0.5
+         wbit in the URL is bytes, not bits
+kv/tok = GQA: 2·L·kv_h·d·kv_bytes
+       | MLA: L·(latent+rope)·kv_bytes
+       | Gemma 3: global layers × ctx + local × window
+kv_worst = kv/tok × ctx × seqs × (1 − hit × 0.75)     STANDS/PAGES uses this
+kv_work  = kv/tok × min(ctx, in+out) × seqs × (1 − hit × 0.75)
+runtime = 2.2 vLLM / 2.4 SGLang   process reserve, not activation
+per_gpu = weight/(tp×pp) + kv_worst/tp + runtime
+         KV shards on TP. PP replicates KV.
+usable = vram × util
 PAGES  = per_gpu > usable
+in, out drive TTFT, batched-tokens, kv_work — not the 57.5 fixture.
 
 fixture  Llama 3.3 70B · 4×H100 · 16K · 16 · util 0.90 · BF16
          JS pack = Go Analyze → 16 STANDS · 57.5 / 72 GB
@@ -269,7 +303,7 @@ fixture  Llama 3.3 70B · 4×H100 · 16K · 16 · util 0.90 · BF16
 <script>
 const MODELS=[
   {id:"llama-3.1-8b",name:"Llama 3.1 8B",hf:"meta-llama/Llama-3.1-8B-Instruct",params:8,layers:32,kvHeads:8,headDim:128,attn:"gqa",moe:false,active:8},
-  {id:"gemma-3-27b",name:"Gemma 3 27B",hf:"google/gemma-3-27b-it",params:27.4,layers:62,kvHeads:16,headDim:128,attn:"gqa",moe:false,active:27.4},
+  {id:"gemma-3-27b",name:"Gemma 3 27B",hf:"google/gemma-3-27b-it",params:27.4,layers:62,kvHeads:16,headDim:128,attn:"gqa",moe:false,active:27.4,window:1024,globalEvery:6},
   {id:"qwen3-8b",name:"Qwen3 8B",hf:"Qwen/Qwen3-8B",params:8.2,layers:36,kvHeads:8,headDim:128,attn:"gqa",moe:false,active:8.2},
   {id:"qwen3-32b",name:"Qwen3 32B",hf:"Qwen/Qwen3-32B",params:32.8,layers:64,kvHeads:8,headDim:128,attn:"gqa",moe:false,active:32.8},
   {id:"qwen3-30b-a3b",name:"Qwen3 30B-A3B",hf:"Qwen/Qwen3-30B-A3B",params:30.5,layers:48,kvHeads:4,headDim:128,attn:"gqa",moe:true,active:3.3},
@@ -296,7 +330,7 @@ const NODES=[
   {id:"STUDIO512",name:"Mac Studio 512 UMA",vram:512,kind:"apple",bw:800,util:0.50,role:"either"},
   {id:"MINI16",name:"Mac Mini 16 UMA",vram:16,kind:"apple",bw:153,util:0.50,role:"agent"},
   {id:"MINI32",name:"Mac Mini 32 UMA",vram:32,kind:"apple",bw:200,util:0.50,role:"agent"},
-  {id:"MINI64",name:"Mac Mini 64 UMA",vram:48,kind:"apple",bw:300,util:0.50,role:"either"}
+  {id:"MINI64",name:"Mac Mini 64 UMA",vram:64,kind:"apple",bw:300,util:0.50,role:"either"}
 ];
 const RATES={
   L40S:{runpod:0.99,lambda:1.20,aws:1.86,own:0.12},
@@ -331,15 +365,56 @@ function kvBytesPerTok(spec,kbit){
 function loraTax(spec,n){ if(!n) return 0; return Math.min(8, n*(0.35+spec.params*0.008)); }
 function specTax(spec,on){ return on? spec.params*0.10 : 0; }
 function pow2down(n){ let t=1; while(t*2<=n) t*=2; return t; }
-function pack(spec,node,n,ctx,seqs,wbit,kbit,util,hit,loraN,specOn,engine){
+function wBytes(id){
+  return ({bf16:2,fp16:2,fp8:1,int8:1,awq4:0.5,gptq4:0.5,q4km:0.5625,q5km:0.6875,q8:1.0625})[id]||2;
+}
+function kBytes(id){ return id==="fp8"?1:2; }
+function parseW(raw){
+  var s=String(raw||"").toLowerCase();
+  if(s==="1"||s==="fp8") return "fp8";
+  if(s==="int8") return "int8";
+  if(s==="awq"||s==="awq4"||s==="awq-4"||s==="awq-4bit") return "awq4";
+  if(s==="gptq"||s==="gptq4"||s==="gptq-4"||s==="gptq-4bit") return "gptq4";
+  if(s==="q4km"||s==="q4_k_m"||s==="0.5") return "awq4";
+  if(s==="2"||s==="bf16"||s==="fp16") return "bf16";
+  return "bf16";
+}
+function parseKv(raw){
+  var s=String(raw||"").toLowerCase();
+  if(s==="1"||s==="fp8"||s==="true") return "fp8";
+  return "bf16";
+}
+function clampUtil(raw){
+  var u=Number(raw);
+  if(!isFinite(u)||u<=0||u>1) return {util:0.90,error:"gpu-memory-utilization 0–1"};
+  if(u<0.30) return {util:0.30,error:null};
+  if(u>0.95) return {util:0.95,error:null};
+  return {util:u,error:null};
+}
+function kvSeqLen(spec,ctx){
+  if(!spec.window) return ctx;
+  var every=spec.globalEvery||6;
+  var g=Math.max(1,Math.ceil(spec.layers/every));
+  var loc=Math.max(0,spec.layers-g);
+  return (g*ctx + loc*Math.min(spec.window,ctx))/spec.layers;
+}
+function pack(spec,node,n,ctx,seqs,wbit,kbit,util,hit,loraN,specOn,engine,inTok,outTok,nodes,xconn){
   n=Math.max(1,Math.floor(n)||1); ctx=Math.max(1,ctx||1); seqs=Math.max(1,seqs||1);
   wbit=wbit>0?wbit:2; kbit=kbit>0?kbit:2;
-  util=Math.min(0.98,Math.max(0.3,util||node.util)); hit=Math.min(0.95,Math.max(0,hit||0));
+  var cu=clampUtil(util); util=cu.util;
+  hit=Math.min(0.95,Math.max(0,hit||0));
+  inTok=Math.max(1,Math.floor(inTok||1024));
+  outTok=Math.max(1,Math.floor(outTok||256));
+  nodes=Math.max(1,Math.floor(nodes||1));
+  xconn=(xconn==="ib"||xconn==="pcie")?xconn:"nvlink";
   const weight=spec.params*wbit;
   const lora=loraTax(spec,loraN);
   const specg=specTax(spec,specOn);
   const kvB=kvBytesPerTok(spec,kbit);
-  const kv=(kvB*ctx*seqs*(1-hit*0.75))/(1024**3);
+  const worstLen=kvSeqLen(spec,ctx);
+  const workLen=kvSeqLen(spec,Math.min(ctx,inTok+outTok));
+  const kv=(kvB*worstLen*seqs*(1-hit*0.75))/(1024**3);
+  const kvWork=(kvB*workLen*seqs*(1-hit*0.75))/(1024**3);
   const runtime=(engine==="sglang")?2.4:2.2;
   const usable=node.vram*util;
   let best=null, fitted=null;
@@ -351,30 +426,63 @@ function pack(spec,node,n,ctx,seqs,wbit,kbit,util,hit,loraN,specOn,engine){
     if(cand<=usable && !fitted) fitted={tp:t,pp:p,per:cand};
   }
   const pick=fitted||best||{tp:pow2down(n),pp:n/pow2down(n),per:Infinity};
-  return {spec:spec,node:node,n:n,ctx:ctx,seqs:seqs,weight:weight+lora+specg,kv:kv,kvB:kvB,runtime:runtime,per:pick.per,usable:usable,oom:pick.per>usable,tp:pick.tp,pp:pick.pp,lora:lora,specg:specg,hit:hit};
+  var lo=0,hi=4096,maxFitSeqs=0;
+  while(lo<=hi){
+    var mid=(lo+hi)>>1;
+    if(mid===0){ lo=1; continue; }
+    var kvMid=(kvB*kvSeqLen(spec,ctx)*mid*(1-hit*0.75))/(1024**3);
+    var perMid=(weight+lora+specg)/n + kvMid/pick.tp + runtime;
+    if(perMid<=usable){ maxFitSeqs=mid; lo=mid+1; } else hi=mid-1;
+  }
+  var flopsMap={H100:989,H200:989,B200:2250,A100:312,L40S:362,RTX4090:330,RTX5090:419,PRO6000:378,SPARK:100,STUDIO192:35,STUDIO512:35,MINI16:15,MINI32:15,MINI64:20};
+  var flops=(flopsMap[node.id]||300)*1e12*n;
+  var active=(spec.active>0?spec.active:spec.params)*wbit;
+  var comm=xconn==="ib"?0.85:xconn==="pcie"?0.7:1;
+  var hbmTokS=((node.bw*n)/Math.max(0.01,active))*comm;
+  var ttftMs=flops>0?((2*(spec.active>0?spec.active:spec.params)*1e9*inTok)/flops)*1000:0;
+  var tpotMs=hbmTokS>0?1000/hbmTokS:0;
+  var batched=Math.min(8192,Math.max(2048,seqs*Math.min(2048,inTok)));
+  var executor=(nodes>1||xconn==="ib")?"ray":"mp";
+  var topo=n<=1?("Single "+node.id+". No TP fabric."):(xconn==="ib"?(n+"×"+node.id+" over IB. Not one NVLink node."):(xconn==="pcie"?(n+"×"+node.id+" over PCIe. Not SXM NVLink."):(n+"×"+node.id+" is one NVLink node. "+n+" separate machines is not this plan.")));
+  return {spec:spec,node:node,n:n,nodes:nodes,ctx:ctx,seqs:seqs,weight:weight+lora+specg,kv:kv,kvWork:kvWork,workLen:workLen,kvB:kvB,runtime:runtime,per:pick.per,usable:usable,oom:pick.per>usable,tp:pick.tp,pp:pick.pp,lora:lora,specg:specg,hit:hit,inTok:inTok,outTok:outTok,xconn:xconn,util:util,utilError:cu.error,maxFitSeqs:maxFitSeqs,hbmTokS:hbmTokS,ttftMs:ttftMs,tpotMs:tpotMs,batched:batched,executor:executor,topology:topo,wbit:wbit,kbit:kbit};
 }
 function read(){
-  var mid=$("model").value; if(mid==="llama-3.1-70b") mid="llama-3.3-70b"; const spec=MODELS.find(function(m){return m.id===mid})||MODELS.find(function(m){return m.id==="llama-3.3-70b"});
-  const node=NODES.find(function(g){return g.id===$("gpu").value})||NODES[2];
+  var mid=$("model").value; if(mid==="llama-3.1-70b") mid="llama-3.3-70b";
+  const spec=MODELS.find(function(m){return m.id===mid});
+  const unknown=!spec && mid && mid!=="custom";
+  const spec2=spec||MODELS.find(function(m){return m.id==="llama-3.3-70b"});
+  const node=NODES.find(function(g){return g.id===$("gpu").value})||NODES.find(function(g){return g.id==="H100"});
   let hit=+$("hit").value/100;
   if($("work").value==="agent" && hit<0.4) hit=0.4;
   let util=+$("util").value;
   if(node.kind!=="cuda" && util>node.util) util=node.util;
-  return pack(spec,node,+$("gpus").value,+$("ctx").value,+$("seqs").value,+$("wbit").value,+$("kbit").value,util,hit,+$("lora").value,+$("spec").value===1,$("engine").value);
+  var a=pack(spec2,node,+$("gpus").value,+$("ctx").value,+$("seqs").value,wBytes($("w").value),kBytes($("kv").value),util,hit,+$("lora").value,+$("spec").value===1,$("engine").value,+$("in").value,+$("out").value,+$("nodes").value,$("xconn").value);
+  a.unknownModel=unknown?mid:null;
+  a.w=$("w").value; a.kvq=$("kv").value;
+  return a;
 }
 function verdict(oom){ return oom?"PAGES":"STANDS"; }
 function cmd(a){
   const e=$("engine").value, uma=a.node.kind!=="cuda";
+  const util=a.util.toFixed(2);
+  const w=$("w").value, kv=$("kv").value;
   if(e==="mlx"){
     if(!uma) return "# MLX is for Apple / UMA only.\n# Pick Studio / Mini / Spark or switch engine.";
-    return "# MLX\nmlx_lm.server --model "+a.spec.hf+" --max-tokens "+a.ctx;
+    return "# MLX template\nmlx_lm.server --model "+a.spec.hf+" --max-tokens "+a.ctx;
   }
-  if(e==="sglang") return "# SGLang\npython -m sglang.launch_server --model-path "+a.spec.hf+" --tp "+a.tp+" --context-length "+a.ctx+" --mem-fraction-static "+(+$("util").value).toFixed(2)+" --enable-prefix-caching";
-  if(e==="trt") return "# TensorRT-LLM · template\ntrtllm-serve "+a.spec.hf+" --tp_size "+a.tp+" --max_seq_len "+a.ctx;
-  if(e==="llama") return "# llama.cpp\n./llama-server -m WEIGHTS.gguf -c "+a.ctx+" -ngl 99 -np "+a.seqs+" --host 0.0.0.0 --port 8080";
-  var s="vllm serve "+a.spec.hf+" --max-model-len "+a.ctx+" --tensor-parallel-size "+a.tp+" --gpu-memory-utilization "+(+$("util").value).toFixed(2)+" --max-num-seqs "+a.seqs+" --enable-prefix-caching";
-  if(a.node.id==="SPARK") s+=" --kv-cache-dtype fp8 --block-size 256 --max-num-batched-tokens 8192";
-  return "# vLLM\n"+s;
+  if(e==="trt") return "# TensorRT-LLM template — not a ready engine.\n# Convert checkpoint, then:\ntrtllm-serve "+a.spec.hf+" --tp_size "+a.tp+" --max_seq_len "+a.ctx;
+  if(e==="llama") return "# llama.cpp template · convert to GGUF first if the Hub file is safetensors\n./llama-server -m "+(a.spec.hf.split("/")[1]||a.spec.id)+"-Q4_K_M.gguf -c "+a.ctx+" -ngl 99 -np "+a.seqs+" --host 0.0.0.0 --port 8080";
+  var qflag=w==="fp8"?" --quantization fp8":w==="awq4"?" --quantization awq":w==="gptq4"?" --quantization gptq":w==="int8"?" --quantization bitsandbytes":" --dtype bfloat16";
+  var kvflag=kv==="fp8"?" --kv-cache-dtype fp8":"";
+  var prefix=a.hit>0?" --enable-prefix-caching":"";
+  var prefixNote=a.hit>0?"":"# prefix-caching off (hit=0). Not a cache-on plan.\n";
+  var gated=a.spec.hf.indexOf("meta-llama/")===0||a.spec.hf.indexOf("google/gemma")===0?"# gated HF checkpoint — export HF_TOKEN; vLLM reads it, do not paste a token here.\n":"";
+  var trust=a.spec.attn==="mla"?" --trust-remote-code":"";
+  var pp=a.pp>1?" --pipeline-parallel-size "+a.pp:"";
+  if(e==="sglang"){
+    return "# SGLang · runtime reserve "+a.runtime.toFixed(1)+" GB\npython -m sglang.launch_server --model-path "+a.spec.hf+" --tp "+a.tp+" --context-length "+a.ctx+" --mem-fraction-static "+util+prefix+(w==="fp8"?" --dtype float8":" --dtype bfloat16")+kvflag;
+  }
+  return "# vLLM · runtime reserve "+a.runtime.toFixed(1)+" GB (process, not activation)\n"+prefixNote+gated+"vllm serve "+a.spec.hf+" --max-model-len "+a.ctx+" --max-num-seqs "+a.seqs+" --tensor-parallel-size "+a.tp+pp+" --gpu-memory-utilization "+util+prefix+" --enable-chunked-prefill --max-num-batched-tokens "+a.batched+" --block-size 16 --swap-space 0 --distributed-executor-backend "+a.executor+qflag+kvflag+trust;
 }
 function syncRate(){
   const row=RATES[$("gpu").value]||RATES.H100;
@@ -390,17 +498,25 @@ function paint(){
     $("stack").innerHTML='<i class="w" style="width:'+(100*wp/sum)+'%"></i><i class="k" style="width:'+(100*kp/sum)+'%"></i><i class="r" style="width:'+(100*a.runtime/sum)+'%"></i>';
     $("m-w").textContent=a.weight.toFixed(1)+" GB";
     $("m-k").textContent=a.kv.toFixed(1)+" GB";
+    if($("m-kw")) $("m-kw").textContent=a.kvWork.toFixed(1)+" GB";
     $("m-kb").textContent=(a.kvB/1024).toFixed(1)+" KB";
     $("m-p").textContent=a.per.toFixed(1)+" GB";
     $("m-u").textContent=a.usable.toFixed(1)+" GB";
     $("m-tp").textContent=a.tp+" × "+a.pp;
+    if($("m-lat")) $("m-lat").textContent=a.ttftMs.toFixed(0)+" / "+a.tpotMs.toFixed(1)+" ms";
+    if($("m-ex")) $("m-ex").textContent=a.executor;
     $("health").className=a.oom?"bad":"ok";
     $("health").textContent=verdict(a.oom)+" · headroom "+(a.usable-a.per).toFixed(1)+" GB";
-    $("nodeNote").textContent=a.node.name+" · "+a.node.kind+" · "+a.node.bw+" GB/s · HF "+a.spec.hf;
+    $("nodeNote").textContent=a.node.name+" · "+a.node.kind+" · "+a.node.bw+" GB/s · "+a.nodes+"×"+a.n+" GPU · HF "+a.spec.hf;
+    if($("applied")) $("applied").textContent="w="+$("w").value+" kv="+$("kv").value+" in="+a.inTok+" out="+a.outTok+" nodes="+a.nodes+" xconn="+a.xconn+" lang="+($("lang").value||"tr");
+    if($("utilErr")){ if(a.utilError){ $("utilErr").hidden=false; $("utilErr").textContent=a.utilError+" · clamped to "+a.util.toFixed(2)+". Launch uses the clamp. Not a PAGES decision."; } else { $("utilErr").hidden=true; $("utilErr").textContent=""; } }
+    document.documentElement.lang=($("lang").value==="en")?"en":"tr";
+    document.title="Pusula · "+verdict(a.oom)+" · "+a.per.toFixed(1)+" / "+a.usable.toFixed(1)+" GB";
+    if(a.unknownModel){ $("fail").hidden=false; $("fail").style.display="block"; $("fail").textContent="unknown model "+a.unknownModel+" — not silently 70B. Pick catalog or custom."; }
     $("attnNote").textContent=(a.spec.attn==="mla"?"attn = MLA":"attn = GQA")+(a.spec.moe?" · MoE loaded "+a.spec.params+"B / active "+a.spec.active+"B":"");
-    const a16=pack(a.spec,a.node,a.n,a.ctx,16,+$("wbit").value,+$("kbit").value,+$("util").value,a.hit,+$("lora").value,+$("spec").value===1,$("engine").value);
-    const a32=pack(a.spec,a.node,a.n,a.ctx,32,+$("wbit").value,+$("kbit").value,+$("util").value,a.hit,+$("lora").value,+$("spec").value===1,$("engine").value);
-    const a8=pack(a.spec,a.node,a.n,Math.min(a.ctx,8192),8,+$("wbit").value,+$("kbit").value,+$("util").value,a.hit,+$("lora").value,+$("spec").value===1,$("engine").value);
+    const a16=pack(a.spec,a.node,a.n,a.ctx,16,wBytes($("w").value),kBytes($("kv").value),+$("util").value,a.hit,+$("lora").value,+$("spec").value===1,$("engine").value);
+    const a32=pack(a.spec,a.node,a.n,a.ctx,32,wBytes($("w").value),kBytes($("kv").value),+$("util").value,a.hit,+$("lora").value,+$("spec").value===1,$("engine").value);
+    const a8=pack(a.spec,a.node,a.n,Math.min(a.ctx,8192),8,wBytes($("w").value),kBytes($("kv").value),+$("util").value,a.hit,+$("lora").value,+$("spec").value===1,$("engine").value);
     if(a.oom && !a16.oom) $("cut").textContent="32 seq pages. 16 seq stands. Cut max-num-seqs.";
     else if(a.oom && a8.oom===false) $("cut").textContent="This pick pages. 8K · 8 seq stands.";
     else if(a.oom) $("cut").textContent="PAGES. Q4 / FP8 or cap ctx before the next card.";
@@ -412,27 +528,28 @@ function paint(){
     $("pdNote").textContent=a.n<4?"Under 4 GPUs a second pool is theater.":(pd==="yes"?"P/D: prefill wants FLOPS. Decode wants HBM.":"Co-locate first.");
     $("ltax").textContent=a.lora.toFixed(1)+" GB";
     $("stax").textContent=a.specg.toFixed(1)+" GB";
-    $("qboard").innerHTML=[{k:"BF16",b:2,f:"full"},{k:"FP8",b:1,f:"ok"},{k:"Q4 est.",b:0.5,f:"lab"}].map(function(r){
+    $("qboard").innerHTML=[{k:"BF16",id:"bf16",b:2,f:"--dtype bfloat16"},{k:"FP8",id:"fp8",b:1,f:"--quantization fp8"},{k:"INT8",id:"int8",b:1,f:"--quantization bitsandbytes"},{k:"AWQ-4",id:"awq4",b:0.5,f:"--quantization awq"},{k:"GPTQ-4",id:"gptq4",b:0.5,f:"--quantization gptq"}].map(function(r){
       return "<tr><td>"+r.k+"</td><td>"+(a.spec.params*r.b).toFixed(1)+"</td><td>"+(((2-r.b)/2)*100).toFixed(0)+"%</td><td>"+r.f+"</td></tr>";
     }).join("");
     $("topo").innerHTML='<div class="chip"><b>GPUS</b>'+a.n+'</div><div class="chip"><b>TP</b>'+a.tp+'</div><div class="chip"><b>PP</b>'+a.pp+'</div>';
-    $("topoNote").textContent=a.n<4?"Under 4 GPUs a second pool is theater.":("TP="+a.tp+" shards weights. PP="+a.pp+" stacks layers.");
+    $("topoNote").textContent=a.topology+" KV shards on TP only — PP replicates KV. Runtime 2.2 GB is process reserve, not activation.";
     $("board").innerHTML=[1,4,16,32].map(function(c){
-      const x=pack(a.spec,a.node,a.n,a.ctx,c,+$("wbit").value,+$("kbit").value,+$("util").value,a.hit,+$("lora").value,+$("spec").value===1,$("engine").value);
+      const x=pack(a.spec,a.node,a.n,a.ctx,c,wBytes($("w").value),kBytes($("kv").value),+$("util").value,a.hit,+$("lora").value,+$("spec").value===1,$("engine").value);
       return "<tr><td>"+c+"</td><td>"+x.kv.toFixed(1)+"</td><td>"+x.per.toFixed(1)+"</td><td class='"+(x.oom?"bad":"ok")+"'>"+verdict(x.oom)+"</td></tr>";
     }).join("");
     $("labLine").textContent=(a16.oom?"16 pages. ":"16 stands. ")+(a32.oom?"32 pages.":"32 stands.");
-    var ledLab=(a16.oom?"16 PAGES":"16 STANDS")+" · "+(a32.oom?"32 PAGES":"32 STANDS");
+    var est=($("lang").value==="en")?"EST.":"TAHMİN";
+    var ledLab=a.maxFitSeqs+" "+verdict(a.oom)+" · "+est;
     $("ledt").textContent=ledLab;
     $("led").className="led "+(a.oom?"bad":"ok");
     $("deskEcho").textContent="This pick: 16 "+verdict(a16.oom)+". 32 "+verdict(a32.oom)+".";
     $("fleet").innerHTML=FLEET.map(function(id){
       const n=NODES.find(function(x){return x.id===id});
-      const x=pack(a.spec,n,1,a.ctx,a.seqs,+$("wbit").value,+$("kbit").value,n.util,a.hit,+$("lora").value,+$("spec").value===1,$("engine").value);
+      const x=pack(a.spec,n,1,a.ctx,a.seqs,wBytes($("w").value),kBytes($("kv").value),n.util,a.hit,+$("lora").value,+$("spec").value===1,$("engine").value);
       return "<div class='node'><div><b>"+n.name+"</b><div class='note' style='margin:4px 0 0'>"+x.per.toFixed(1)+" / "+x.usable.toFixed(1)+" GB</div></div><b class='"+(x.oom?"bad":"ok")+"'>"+verdict(x.oom)+"</b></div>";
     }).join("");
     const rate=Math.max(0,+$("rate").value), hrs=Math.max(1,+$("hrs").value), api=Math.max(0.01,+$("apim").value);
-    const mo=rate*a.n*hrs;
+    const mo=rate*a.n*a.nodes*hrs;
     const tps=a.node.kind==="apple"?80:(a.node.id==="SPARK"?400:1600);
     const mil=(rate/(tps*3600*0.4))*1e6;
     $("m-mo").textContent="$"+mo.toFixed(0);
@@ -450,8 +567,8 @@ function paint(){
       $("ctx").value="16384";
       $("seqs").value="16";
       $("util").value="0.90";
-      $("wbit").value="2";
-      $("kbit").value="2";
+      $("w").value="bf16";
+      $("kv").value="bf16";
       $("hit").value="0";
       $("engine").value="vllm";
       $("fail").removeAttribute("hidden");
@@ -475,6 +592,10 @@ function paint(){
 function applyPlay(id){
   const p=PLAYS.find(function(x){return x.id===id}); if(!p) return;
   Object.keys(p.set).forEach(function(k){ if($(k)) $(k).value=p.set[k]; });
+  if(p.set.wbit && $("w")) $("w").value=parseW(p.set.wbit);
+  if(p.set.kbit && $("kv")) $("kv").value=parseKv(p.set.kbit);
+  if(p.set.w && $("w")) $("w").value=parseW(p.set.w);
+  if(p.set.kv && $("kv")) $("kv").value=parseKv(p.set.kv);
   $("playNote").textContent=p.n;
   if(p.set.gpu){
     const node=NODES.find(function(g){return g.id===p.set.gpu});
@@ -493,7 +614,7 @@ $("engPills").addEventListener("click",function(e){
   Array.prototype.forEach.call($("engPills").children,function(x){x.className=x===b?"on":"";});
   paint();
 });
-["model","wbit","kbit","ctx","seqs","hit","engine","gpu","gpus","lora","spec","util","work"].forEach(function(id){
+["model","w","kv","in","out","nodes","xconn","lang","ctx","seqs","hit","engine","gpu","gpus","lora","spec","util","work"].forEach(function(id){
   $(id).addEventListener("input",function(){
     if(id==="gpu"){ const n=NODES.find(function(g){return g.id===$("gpu").value}); if(n) $("util").value=n.util; syncRate(); }
     if(id==="work" && $("work").value==="agent") $("hit").value="40";
@@ -533,18 +654,44 @@ $("share").onclick=function(){
 };
 (function fromUrl(){
   const q=new URLSearchParams(location.search);
-  if(q.has("m") && !q.has("model")) q.set("model", q.get("m"));
-  if(q.has("e") && !q.has("engine")) q.set("engine", q.get("e"));
-  if(q.has("u") && !q.has("util")) q.set("util", q.get("u"));
-  ["model","gpu","gpus","ctx","seqs","wbit","kbit","util","hit","work","engine","lora"].forEach(function(k){
+  [["m","model"],["e","engine"],["u","util"],["weights","w"],["quant","w"],["dtype","w"],["kvdtype","kv"],["prompt","in"],["isl","in"],["gen","out"],["osl","out"]].forEach(function(p){
+    if(q.has(p[0]) && !q.has(p[1])) q.set(p[1], q.get(p[0]));
+  });
+  var w=parseW(q.get("w")||q.get("wbit"));
+  if($("w")) $("w").value=w;
+  var kv=parseKv(q.get("kv")||q.get("kbit"));
+  if(q.get("kvfp8")==="1") kv="fp8";
+  if($("kv")) $("kv").value=kv;
+  ["model","gpu","gpus","ctx","seqs","util","hit","work","engine","lora","in","out","nodes","xconn","lang"].forEach(function(k){
     if(q.has(k) && $(k)) $(k).value=q.get(k);
   });
   if(q.get("spec")==="1") $("spec").value="1";
-  if(q.get("model")==="llama-3.1-70b") $("model").value="llama-3.3-70b";
+  if((q.get("model")||"")==="llama-3.1-70b") $("model").value="llama-3.3-70b";
+  document.documentElement.lang=($("lang") && $("lang").value==="en")?"en":"tr";
 })();
 function toUrl(){
   const q=new URLSearchParams();
-  ["model","gpu","gpus","ctx","seqs","wbit","kbit","util","hit","work","engine"].forEach(function(k){ q.set(k,$(k).value); });
+  var w=$("w").value||"bf16";
+  var kv=$("kv").value||"bf16";
+  var cu=clampUtil(+$("util").value);
+  q.set("model",$("model").value);
+  q.set("gpu",$("gpu").value);
+  q.set("gpus",$("gpus").value);
+  q.set("ctx",$("ctx").value);
+  q.set("seqs",$("seqs").value);
+  q.set("engine",$("engine").value);
+  q.set("util",cu.util.toFixed(2));
+  q.set("w",w);
+  q.set("kv",kv);
+  q.set("wbit", String(wBytes(w)===2?2:wBytes(w)===1?1:wBytes(w)));
+  q.set("kbit", kv==="fp8"?"1":"2");
+  q.set("in", $("in").value||"1024");
+  q.set("out", $("out").value||"256");
+  q.set("nodes", $("nodes").value||"1");
+  q.set("xconn", $("xconn").value||"nvlink");
+  q.set("lang", $("lang").value||"tr");
+  q.set("work", $("work").value);
+  if(+$("hit").value) q.set("hit",$("hit").value);
   if(+$("lora").value) q.set("lora",$("lora").value);
   if($("spec").value==="1") q.set("spec","1");
   history.replaceState(null,"",location.pathname+"?"+q.toString());
