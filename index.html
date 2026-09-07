@@ -89,8 +89,8 @@ footer.legal{margin-top:14px;color:var(--dim);font-size:13px;line-height:1.5}
   <div class="row" style="margin:0">
     <select id="lang" style="width:auto;min-height:44px"><option value="tr">TR</option><option value="en">EN</option></select>
     <a href="#plan">Plan</a><a href="#lab">Lab</a>
+    <a href="#launch">Launch</a><a href="#docs">Docs</a>
     <button type="button" id="share">Share</button>
-    <a href="#lab">Lab</a>
     <a href="https://x.com/pusulainfra">X</a>
     <a href="https://github.com/PusulaInfra/pusula-serve">Repo</a>
   </div>
@@ -141,7 +141,7 @@ footer.legal{margin-top:14px;color:var(--dim);font-size:13px;line-height:1.5}
   <div><label>generation · out</label><input id="out" type="number" min="1" value="256"/></div>
 </div>
 <div class="grid2">
-  <div><label>Workload</label><select id="work"><option value="infer">infer</option><option value="agent">agent</option></select></div>
+  <div><label>Workload</label><select id="work"><option value="infer">infer</option><option value="chat">chat</option><option value="agent">agent</option><option value="rag">rag</option><option value="batch">batch</option></select></div>
   <div><label>Engine</label><select id="engine">
     <option value="vllm">vLLM</option><option value="sglang">SGLang</option>
     <option value="mlx">MLX</option><option value="llama">llama.cpp</option>
@@ -227,7 +227,7 @@ footer.legal{margin-top:14px;color:var(--dim);font-size:13px;line-height:1.5}
 <div class="topo" id="topo"></div>
 <p class="note" id="topoNote"></p>
 </section>
-<section class="card glass"><h2>Lab board</h2>
+<section class="card glass" id="lab"><h2>Lab board</h2>
 <div class="wrap"><table><thead><tr><th>Conc</th><th>KV GB</th><th>Per device</th><th>Verdict</th></tr></thead><tbody id="board"></tbody></table></div>
 <p class="note" id="labLine"></p>
 </section>
@@ -236,7 +236,7 @@ footer.legal{margin-top:14px;color:var(--dim);font-size:13px;line-height:1.5}
 <div id="fleet"></div>
 </section>
 <section class="grid2">
-<div class="card glass"><h2>Launch scripts</h2>
+<div class="card glass" id="launch"><h2>Launch</h2>
 <div class="pills" id="engPills">
   <button type="button" data-e="vllm" class="on">vLLM</button>
   <button type="button" data-e="sglang">SGLang</button>
@@ -259,7 +259,7 @@ footer.legal{margin-top:14px;color:var(--dim);font-size:13px;line-height:1.5}
 <p class="note" id="ans">This page does not promise tok/s. If an estimate appears, it is marked.</p>
 </div>
 </section>
-<section class="card glass"><h2>Formula</h2>
+<section class="card glass" id="docs"><h2>Docs · Formula</h2>
 <pre>weight = params_b * weight_bytes     BF16=2  FP8=1  AWQ-4=0.5
          wbit in the URL is bytes, not bits
 kv/tok = GQA: 2·L·kv_h·d·kv_bytes
@@ -278,8 +278,8 @@ fixture  Llama 3.3 70B · 4×H100 · 16K · 16 · util 0.90 · BF16
          JS pack = Go Analyze → 16 STANDS · 57.5 / 72 GB
          same · 32 seq → 32 PAGES</pre>
 </section>
-<section class="card glass" id="lab">
-<h2>Lab · this box</h2>
+<section class="card glass">
+<h2>Desk</h2>
 <p style="margin:0 0 8px">Pusula. One planner. Operator PusulaInfra · Istanbul / Kocaeli. We try the box. We do not fake a train log.</p>
 <p class="note" id="deskEcho">This pick: 16 … 32 …</p>
 <div class="row">
@@ -438,13 +438,18 @@ function pack(spec,node,n,ctx,seqs,wbit,kbit,util,hit,loraN,specOn,engine,inTok,
   var flops=(flopsMap[node.id]||300)*1e12*n;
   var active=(spec.active>0?spec.active:spec.params)*wbit;
   var comm=xconn==="ib"?0.85:xconn==="pcie"?0.7:1;
-  var hbmTokS=((node.bw*n)/Math.max(0.01,active))*comm;
+  var hbmTokS=((node.bw*pick.tp)/Math.max(0.01,active))*comm;
   var ttftMs=flops>0?((2*(spec.active>0?spec.active:spec.params)*1e9*inTok)/flops)*1000:0;
   var tpotMs=hbmTokS>0?1000/hbmTokS:0;
   var batched=Math.min(8192,Math.max(2048,seqs*Math.min(2048,inTok)));
   var executor=(nodes>1||xconn==="ib")?"ray":"mp";
   var topo=n<=1?("Single "+node.id+". No TP fabric."):(xconn==="ib"?(n+"×"+node.id+" over IB. Not one NVLink node."):(xconn==="pcie"?(n+"×"+node.id+" over PCIe. Not SXM NVLink."):(n+"×"+node.id+" is one NVLink node. "+n+" separate machines is not this plan.")));
-  return {spec:spec,node:node,n:n,nodes:nodes,ctx:ctx,seqs:seqs,weight:weight+lora+specg,kv:kv,kvWork:kvWork,workLen:workLen,kvB:kvB,runtime:runtime,per:pick.per,usable:usable,oom:pick.per>usable,tp:pick.tp,pp:pick.pp,lora:lora,specg:specg,hit:hit,inTok:inTok,outTok:outTok,xconn:xconn,util:util,utilError:cu.error,maxFitSeqs:maxFitSeqs,hbmTokS:hbmTokS,ttftMs:ttftMs,tpotMs:tpotMs,batched:batched,executor:executor,topology:topo,wbit:wbit,kbit:kbit};
+  var reserved=0.12*Math.max(0,pick.tp-1)+0.4+0.015*seqs+(xconn==="ib"?0.35*nodes:xconn==="pcie"?0.18:0);
+  var e2eMs=ttftMs+outTok*tpotMs;
+  var qps=e2eMs>0?seqs/(e2eMs/1000):0;
+  var topologyWarn=(n>1&&xconn==="nvlink"&&nodes>1)?"this is not TP, it is replica":null;
+  var kvLayer=kv/Math.max(1,pick.tp*pick.pp);
+  return {spec:spec,node:node,n:n,nodes:nodes,ctx:ctx,seqs:seqs,weight:weight+lora+specg,kv:kv,kvWork:kvWork,workLen:workLen,kvB:kvB,runtime:runtime,per:pick.per,usable:usable,oom:pick.per>usable,tp:pick.tp,pp:pick.pp,lora:lora,specg:specg,hit:hit,inTok:inTok,outTok:outTok,xconn:xconn,util:util,utilError:cu.error,maxFitSeqs:maxFitSeqs,hbmTokS:hbmTokS,ttftMs:ttftMs,tpotMs:tpotMs,batched:batched,executor:executor,topology:topo,wbit:wbit,kbit:kbit,reserved:reserved,e2eMs:e2eMs,qps:qps,topologyWarn:topologyWarn,kvLayer:kvLayer};
 }
 function read(){
   var mid=$("model").value; if(mid==="llama-3.1-70b") mid="llama-3.3-70b";
@@ -461,7 +466,10 @@ function read(){
   a.w=$("w").value; a.kvq=$("kv").value;
   return a;
 }
-function verdict(oom){ return oom?"PAGES":"STANDS"; }
+function verdict(oom){
+  var tr=$("lang") && $("lang").value!=="en";
+  return oom?(tr?"SIĞMAZ":"OOM"):(tr?"SIĞAR":"FITS");
+}
 function cmd(a){
   const e=$("engine").value, uma=a.node.kind!=="cuda";
   const util=a.util.toFixed(2);
@@ -506,7 +514,13 @@ function paint(){
     if($("m-lat")) $("m-lat").textContent=a.ttftMs.toFixed(0)+" / "+a.tpotMs.toFixed(1)+" ms";
     if($("m-ex")) $("m-ex").textContent=a.executor;
     $("health").className=a.oom?"bad":"ok";
-    $("health").textContent=verdict(a.oom)+" · headroom "+(a.usable-a.per).toFixed(1)+" GB";
+    var tr=$("lang").value!=="en";
+    var hr=(a.usable-a.per);
+    $("health").textContent=verdict(a.oom)+" · "+(tr?"pay":"headroom")+" "+hr.toFixed(1)+" GB";
+    if(a.topologyWarn){
+      $("fail").hidden=false; $("fail").style.display="block";
+      $("fail").textContent=tr?"Bu TP değil, replica. NVLink tek node varsayımı nodes>1 iken geçersiz.":"This is not TP, it is replica.";
+    }
     $("nodeNote").textContent=a.node.name+" · "+a.node.kind+" · "+a.node.bw+" GB/s · "+a.nodes+"×"+a.n+" GPU · HF "+a.spec.hf;
     if($("applied")) $("applied").textContent="w="+$("w").value+" kv="+$("kv").value+" in="+a.inTok+" out="+a.outTok+" nodes="+a.nodes+" xconn="+a.xconn+" lang="+($("lang").value||"tr");
     if($("utilErr")){ if(a.utilError){ $("utilErr").hidden=false; $("utilErr").textContent=a.utilError+" · clamped to "+a.util.toFixed(2)+". Launch uses the clamp. Not a PAGES decision."; } else { $("utilErr").hidden=true; $("utilErr").textContent=""; } }
@@ -538,9 +552,10 @@ function paint(){
       return "<tr><td>"+c+"</td><td>"+x.kv.toFixed(1)+"</td><td>"+x.per.toFixed(1)+"</td><td class='"+(x.oom?"bad":"ok")+"'>"+verdict(x.oom)+"</td></tr>";
     }).join("");
     $("labLine").textContent=(a16.oom?"16 pages. ":"16 stands. ")+(a32.oom?"32 pages.":"32 stands.");
-    var est=($("lang").value==="en")?"EST.":"TAHMİN";
-    var ledLab=a.maxFitSeqs+" "+verdict(a.oom)+" · "+est;
-    $("ledt").textContent=ledLab;
+    var est=($("lang").value==="en")?"est.":"tahmin";
+    var assume=(a.nodes>1&&a.xconn==="nvlink")?(($("lang").value==="en")?"NVLink replica, not TP":"NVLink replica, TP değil"):(a.xconn==="nvlink"?(($("lang").value==="en")?"NVLink one node":"NVLink tek node"):a.xconn);
+    var band=Math.max(0.8, a.reserved*0.5 + a.per*0.04);
+    $("ledt").textContent=verdict(a.oom)+" ("+est+") · "+assume+" · ±"+band.toFixed(1)+" GB";
     $("led").className="led "+(a.oom?"bad":"ok");
     $("deskEcho").textContent="This pick: 16 "+verdict(a16.oom)+". 32 "+verdict(a32.oom)+".";
     $("fleet").innerHTML=FLEET.map(function(id){
@@ -560,32 +575,9 @@ function paint(){
     $("engNote").textContent=(($("engine").value==="mlx"&&!uma)?"MLX disabled on CUDA. Pick UMA or another engine.":"No API key. No SSH agent. Copy onto your own box.")+" tok/s and $/M are estimates / not measured.";
     $("ans").textContent="Stand up? "+(a.oom?"No.":"Yes.")+"  P/D? "+pd+".  One replica per LoRA? No.  Sell CPUs? No.  tok/s? This page does not promise tok/s.";
   }catch(err){
-    try{
-      $("model").value="llama-3.3-70b";
-      $("gpu").value="H100";
-      $("gpus").value="4";
-      $("ctx").value="16384";
-      $("seqs").value="16";
-      $("util").value="0.90";
-      $("w").value="bf16";
-      $("kv").value="bf16";
-      $("hit").value="0";
-      $("engine").value="vllm";
-      $("fail").removeAttribute("hidden");
-      $("fail").style.display="block";
-      $("fail").textContent="reset to 70B · 4×H100 · 16K · 16";
-      const a=read();
-      $("m-w").textContent=a.weight.toFixed(1)+" GB";
-      $("m-k").textContent=a.kv.toFixed(1)+" GB";
-      $("m-p").textContent=a.per.toFixed(1)+" GB";
-      $("m-u").textContent=a.usable.toFixed(1)+" GB";
-      $("health").className=a.oom?"bad":"ok";
-      $("health").textContent=verdict(a.oom)+" · headroom "+(a.usable-a.per).toFixed(1)+" GB";
-    }catch(e2){
-      $("fail").removeAttribute("hidden");
-      $("fail").style.display="block";
-      $("fail").textContent="reset to 70B · 4×H100 · 16K · 16";
-    }
+    $("fail").removeAttribute("hidden");
+    $("fail").style.display="block";
+    $("fail").textContent="pack() failed. Did not silently reset. "+(err&&err.message?err.message:String(err));
     hideBootNow();
   }
 }
@@ -677,6 +669,8 @@ function toUrl(){
   q.set("model",$("model").value);
   q.set("gpu",$("gpu").value);
   q.set("gpus",$("gpus").value);
+  q.set("gpusPerNode", $("gpus").value);
+  q.set("math", "v3");
   q.set("ctx",$("ctx").value);
   q.set("seqs",$("seqs").value);
   q.set("engine",$("engine").value);

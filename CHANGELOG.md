@@ -1,5 +1,15 @@
 # Changelog
 
+## 2026-09-07
+Upper-version console. Same 57.5 / 72 fixture.
+
+- Nav is Plan · Lab · Launch · Docs · TR/EN. Dual `#lab` links are gone. Lab board is the one `#lab`. Desk is not Lab.
+- LED: SIĞAR / SIĞMAZ (tahmin) · NVLink tek node · ±X GB. lang=tr translates the verdict, not only html lang.
+- Decode tok/s uses TP, not GPU count. PP does not inflate throughput.
+- pack() reserved / activation / NCCL stay out of per_gpu. paint() fail shows #fail and does **not** silently reset to 70B.
+- Workloads: infer / chat / agent / rag / batch. URL writes `math=v3` and `gpusPerNode`.
+- Fixture still: 70B · 4×H100 · 16K×16 BF16 → 57.5/72 SIĞAR. Same 32 seq → SIĞMAZ 77.5. 8K×8 → 42.5/72.
+
 ## 2026-09-06
 Share URL keys now drive pack() and the launch command. Adding them to the query was not enough — fromUrl, pack, and cmd read them.
 
